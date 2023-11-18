@@ -1,10 +1,8 @@
-from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException, Response, Request
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import RedirectResponse
+from pydantic import BaseModel
 
 import auth
-from auth.constant import AUTH_ACCESS_TOKEN_COOKIE, AUTH_REFRESH_TOKEN_COOKIE
-from auth.dependencies import verify_token
 
 router = APIRouter(
     prefix="/auth",
@@ -26,26 +24,19 @@ async def shelter_login():
 
 
 @router.get("/shelter/callback")
-async def shelter_login_callback(request: Request, response: Response):
+async def shelter_login_callback(request: Request):
     try:
         code = request.query_params.get('code')
         shelter_data, token, refresh_token = auth.service.generate_shelter_token(
             code=code)
 
-        response.set_cookie(key=AUTH_ACCESS_TOKEN_COOKIE,
-                            value='Bearer ' + token,
-                            httponly=True,
-                            path="/"
-                            )
-        response.set_cookie(key=AUTH_REFRESH_TOKEN_COOKIE,
-                            value=refresh_token,
-                            httponly=True,
-                            path="/"
-                            )
-
         return {
             "message": "Logged in successfully!",
-            "data": shelter_data
+            "data": shelter_data,
+            "token": {
+                "access_token": token,
+                "refresh_token": refresh_token
+            },
         }
     except Exception:
         raise HTTPException(
@@ -54,17 +45,28 @@ async def shelter_login_callback(request: Request, response: Response):
         )
 
 
-@router.get("/logout")
-async def logout(_: Annotated[dict, Depends(verify_token)], response: Response):
+class RefreshTokenRequestBody(BaseModel):
+    refresh_token: str
+
+
+@router.post("/shelter/refresh-token")
+async def shelter_refresh_token(body: RefreshTokenRequestBody):
     try:
-        response.delete_cookie(key=AUTH_ACCESS_TOKEN_COOKIE, path="/")
-        response.delete_cookie(key=AUTH_REFRESH_TOKEN_COOKIE, path="/")
+        shelter_data, token, refresh_token = auth.service.refresh_shelter_token(
+            refresh_token=body.refresh_token
+        )
 
         return {
-            "message": "Logged out successfully!"
+            "message": "Logged in successfully!",
+            "data": shelter_data,
+            "token": {
+                "access_token": token,
+                "refresh_token": refresh_token
+            },
         }
-    except Exception:
+    except Exception as e:
+        print(e)
         raise HTTPException(
             status_code=500,
-            detail="Could not log out."
+            detail="Could not refresh."
         )

@@ -6,7 +6,7 @@ from auth.service import get_user_from_token
 
 def verify_token(request: Request) -> dict:
     try:
-        access_token = request.cookies.get(AUTH_ACCESS_TOKEN_COOKIE)
+        access_token = request.headers.get('Authorization')
         access_token = access_token.split(' ')[1]
     except AttributeError:
         raise HTTPException(

@@ -1,4 +1,3 @@
-
 from cachecontrol import CacheControl
 import requests
 import google_auth_oauthlib.flow
@@ -6,7 +5,7 @@ from google.oauth2 import id_token
 import google.oauth2.credentials
 import google.auth.transport.requests
 
-from auth.config import GOOGLE_ADOPTER_CLIENT_ID, GOOGLE_SHELTER_CLIENT_ID, SHELTER_CLIENT_REDIRECT_URI, SHELTER_CLIENT_SECRET_FILE
+from auth.config import GOOGLE_ADOPTER_CLIENT_ID, GOOGLE_SHELTER_CLIENT_ID, GOOGLE_SHELTER_CLIENT_SECRET, SHELTER_CLIENT_REDIRECT_URI, SHELTER_CLIENT_SECRET_FILE
 from auth.exceptions import UnauthorizedError
 
 
@@ -91,3 +90,43 @@ def get_user_from_token(token: str) -> dict:
         return user_data
     except ValueError:
         raise UnauthorizedError('Could not verify token.')
+
+
+def refresh_shelter_token(refresh_token: str) -> (dict, str, str):
+    try:
+        credentials = google.oauth2.credentials.Credentials(
+            None,
+            refresh_token=refresh_token,
+            token_uri='https://oauth2.googleapis.com/token',
+            client_id=GOOGLE_SHELTER_CLIENT_ID,
+            client_secret=GOOGLE_SHELTER_CLIENT_SECRET
+        )
+
+        request = google.auth.transport.requests.Request()
+        credentials.refresh(request)
+
+        session = requests.session()
+        cached_session = CacheControl(session)
+        request = google.auth.transport.requests.Request(
+            session=cached_session
+        )
+
+        payload = id_token.verify_oauth2_token(
+            id_token=credentials.id_token,
+            request=request,
+            audience=GOOGLE_SHELTER_CLIENT_ID
+        )
+
+        user_data = {
+            "id": payload["sub"],
+            "email": payload["email"],
+            "name": payload["name"],
+            "picture": payload["picture"],
+            "given_name": payload["given_name"],
+            "family_name": payload["family_name"],
+            "role": "SHELTER"
+        }
+
+        return user_data, credentials.id_token, credentials.refresh_token
+    except ValueError:
+        raise UnauthorizedError('Could not refresh token.')
