@@ -3,6 +3,7 @@ from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 
 import auth
+from auth import service
 
 router = APIRouter(
     prefix="/auth",
