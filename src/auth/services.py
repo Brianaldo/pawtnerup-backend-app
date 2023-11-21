@@ -1,3 +1,4 @@
+from typing import Union
 from cachecontrol import CacheControl
 import requests
 import google_auth_oauthlib.flow
@@ -5,8 +6,9 @@ from google.oauth2 import id_token
 import google.oauth2.credentials
 import google.auth.transport.requests
 
-from auth.config import GOOGLE_ADOPTER_CLIENT_ID, GOOGLE_SHELTER_CLIENT_ID, GOOGLE_SHELTER_CLIENT_SECRET, SHELTER_CLIENT_REDIRECT_URI, SHELTER_CLIENT_SECRET_FILE
+from auth.configs import GOOGLE_ADOPTER_CLIENT_ID, GOOGLE_SHELTER_CLIENT_ID, GOOGLE_SHELTER_CLIENT_SECRET, SHELTER_CLIENT_REDIRECT_URI, SHELTER_CLIENT_SECRET_FILE
 from auth.exceptions import UnauthorizedError
+from auth.models import AdopterGoogleUser, GoogleUser, ShelterGoogleUser
 
 
 flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
@@ -29,7 +31,7 @@ def get_shelter_authorization_url() -> tuple:
     return authorization_url, state
 
 
-def generate_shelter_token(code: str) -> (dict, str, str):
+def generate_shelter_token(code: str) -> tuple[ShelterGoogleUser, str, str]:
     try:
         flow.fetch_token(code=code)
         credentials = flow.credentials
@@ -46,22 +48,21 @@ def generate_shelter_token(code: str) -> (dict, str, str):
             audience=GOOGLE_SHELTER_CLIENT_ID
         )
 
-        user_data = {
-            "id": payload["sub"],
-            "email": payload["email"],
-            "name": payload["name"],
-            "picture": payload["picture"],
-            "given_name": payload["given_name"],
-            "family_name": payload["family_name"],
-            "role": "SHELTER"
-        }
+        user_data = ShelterGoogleUser(
+            id=payload['sub'],
+            email=payload['email'],
+            name=payload['name'],
+            picture=payload['picture'],
+            given_name=payload['given_name'],
+            family_name=payload['family_name']
+        )
 
-        return user_data, credentials._id_token, credentials.refresh_token
+        return (user_data, credentials._id_token, credentials.refresh_token)
     except ValueError:
         raise UnauthorizedError('Could not verify token.')
 
 
-def get_user_from_token(token: str) -> dict:
+def get_user_from_token(token: str) -> Union[ShelterGoogleUser, AdopterGoogleUser]:
     try:
         session = requests.session()
         cached_session = CacheControl(session)
@@ -77,22 +78,25 @@ def get_user_from_token(token: str) -> dict:
         if payload['aud'] not in [GOOGLE_SHELTER_CLIENT_ID, GOOGLE_ADOPTER_CLIENT_ID]:
             raise UnauthorizedError('Could not verify client.')
 
-        user_data = {
-            "id": payload["sub"],
-            "email": payload["email"],
-            "name": payload["name"],
-            "picture": payload["picture"],
-            "given_name": payload["given_name"],
-            "family_name": payload["family_name"],
-            "role": "SHELTER" if payload['aud'] == GOOGLE_SHELTER_CLIENT_ID else "ADOPTER"
-        }
+        user_data = GoogleUser(
+            id=payload['sub'],
+            email=payload['email'],
+            name=payload['name'],
+            picture=payload['picture'],
+            given_name=payload['given_name'],
+            family_name=payload['family_name'],
+        )
+        if payload['aud'] == GOOGLE_SHELTER_CLIENT_ID:
+            user_data = ShelterGoogleUser(**user_data.model_dump())
+        else:
+            user_data = AdopterGoogleUser(**user_data.model_dump())
 
         return user_data
     except ValueError:
         raise UnauthorizedError('Could not verify token.')
 
 
-def refresh_shelter_token(refresh_token: str) -> (dict, str, str):
+def refresh_shelter_token(refresh_token: str) -> tuple[ShelterGoogleUser, str, str]:
     try:
         credentials = google.oauth2.credentials.Credentials(
             None,
@@ -117,15 +121,14 @@ def refresh_shelter_token(refresh_token: str) -> (dict, str, str):
             audience=GOOGLE_SHELTER_CLIENT_ID
         )
 
-        user_data = {
-            "id": payload["sub"],
-            "email": payload["email"],
-            "name": payload["name"],
-            "picture": payload["picture"],
-            "given_name": payload["given_name"],
-            "family_name": payload["family_name"],
-            "role": "SHELTER"
-        }
+        user_data = ShelterGoogleUser(
+            id=payload['sub'],
+            email=payload['email'],
+            name=payload['name'],
+            picture=payload['picture'],
+            given_name=payload['given_name'],
+            family_name=payload['family_name']
+        )
 
         return user_data, credentials.id_token, credentials.refresh_token
     except ValueError:

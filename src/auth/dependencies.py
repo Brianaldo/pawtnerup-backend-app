@@ -1,7 +1,6 @@
 from fastapi import HTTPException, Request
 
-from auth.constant import AUTH_ACCESS_TOKEN_COOKIE
-from auth.service import get_user_from_token
+from auth.services import get_user_from_token
 
 
 def verify_token(request: Request) -> dict:
