@@ -32,23 +32,22 @@ async def shelter_oauth2_callback(body: LoginCallbackRequestBody):
         )
 
 
-# @router.post("/shelter/refresh-token")
-# async def shelter_refresh_token(body: RefreshTokenRequestBody):
-#     try:
-#         shelter_data, token, refresh_token = auth.services.refresh_shelter_token(
-#             refresh_token=body.refresh_token
-#         )
+@router.post("/shelter/refresh-token", response_model=GenericObjectResponse[LoginResponse])
+async def shelter_refresh_token(body: RefreshTokenRequestBody):
+    try:
+        shelter_data, token, refresh_token = auth.services.refresh_shelter_token(
+            refresh_token=body.refresh_token
+        )
 
-#         return GenericObjectResponse(
-#             message="Logged in successfully!",
-#             data=LoginResponse(**shelter_data.model_dump(),
-#                                access_token=token,
-#                                refresh_token=refresh_token
-#                                )
-#         )
-#     except Exception as e:
-#         print(e)
-#         raise HTTPException(
-#             status_code=500,
-#             detail="Could not refresh."
-#         )
+        return GenericObjectResponse(
+            message="Refreshed successfully!",
+            data=LoginResponse(**shelter_data.model_dump(),
+                               access_token=token,
+                               refresh_token=refresh_token
+                               )
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail="Could not refresh."
+        )
