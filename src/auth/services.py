@@ -6,7 +6,7 @@ from google.oauth2 import id_token
 import google.oauth2.credentials
 import google.auth.transport.requests
 
-from auth.configs import GOOGLE_ADOPTER_CLIENT_ID, GOOGLE_SHELTER_CLIENT_ID, GOOGLE_SHELTER_CLIENT_SECRET, SHELTER_CLIENT_REDIRECT_URI, SHELTER_CLIENT_SECRET_FILE
+from auth.configs import GOOGLE_ADOPTER_CLIENT_ID, GOOGLE_SHELTER_CLIENT_ID, GOOGLE_SHELTER_CLIENT_SECRET, SHELTER_CLIENT_SECRET_FILE
 from auth.exceptions import UnauthorizedError
 from auth.models import AdopterGoogleUser, GoogleUser, ShelterGoogleUser
 
@@ -18,7 +18,7 @@ flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
         "https://www.googleapis.com/auth/userinfo.email",
         "openid"
     ],
-    redirect_uri=SHELTER_CLIENT_REDIRECT_URI
+    redirect_uri='postmessage'
 )
 
 
@@ -33,7 +33,7 @@ def get_shelter_authorization_url() -> tuple:
 
 def generate_shelter_token(code: str) -> tuple[ShelterGoogleUser, str, str]:
     try:
-        flow.fetch_token(code=code)
+        flow.fetch_token(code=code, )
         credentials = flow.credentials
 
         session = requests.session()
