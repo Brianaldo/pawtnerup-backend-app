@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  pawtnerup_backend_app:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: pawtnerup_backend_app
+    container_name: pawtnerup_backend_app
+    volumes:
+      - .:/app
+    ports:
+      - "8000:80"
+  pawtnerup_db:
+    image: postgres:14.0-alpine
+    container_name: pawtnerup_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=pawtnerup
+    volumes: 
+      - pawtnerup_db_data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:8003:5432"
+
+volumes:
+  pawtnerup_db_data:
