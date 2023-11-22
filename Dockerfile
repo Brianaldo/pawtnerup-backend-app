@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY . .
 
+RUN apt-get update
+RUN apt-get install libpq-dev
 RUN pip install -r requirements.txt
 
 EXPOSE 8000
