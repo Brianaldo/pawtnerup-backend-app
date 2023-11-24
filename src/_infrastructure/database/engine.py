@@ -1,5 +1,4 @@
 from sqlalchemy import create_engine
-import psycopg2
 
 from _infrastructure.database.configs import POSTGRES_DB, POSTGRES_HOST, POSTGRES_PASSWORD, POSTGRES_USER
 
