@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from _common import *
 
 from auth.models import LoginCallbackRequestBody, LoginResponse, RefreshTokenRequestBody, ShelterGoogleUser
-import auth.services
+import auth.service
 
 router = APIRouter(
     prefix="/auth",
@@ -13,7 +13,8 @@ router = APIRouter(
 @router.post("/shelter/oauth2callback", response_model=GenericObjectResponse[LoginResponse])
 async def shelter_oauth2_callback(body: LoginCallbackRequestBody):
     try:
-        shelter_data, token, refresh_token = auth.services.generate_shelter_token(
+        service = auth.service.AuthService()
+        shelter_data, token, refresh_token = service.generate_shelter_token(
             code=body.code
         )
 
@@ -35,7 +36,8 @@ async def shelter_oauth2_callback(body: LoginCallbackRequestBody):
 @router.post("/shelter/refresh-token", response_model=GenericObjectResponse[LoginResponse])
 async def shelter_refresh_token(body: RefreshTokenRequestBody):
     try:
-        shelter_data, token, refresh_token = auth.services.refresh_shelter_token(
+        service = auth.service.AuthService()
+        shelter_data, token, refresh_token = service.refresh_shelter_token(
             refresh_token=body.refresh_token
         )
 
@@ -47,6 +49,7 @@ async def shelter_refresh_token(body: RefreshTokenRequestBody):
                                )
         )
     except Exception as e:
+        print(e)
         raise HTTPException(
             status_code=500,
             detail="Could not refresh."

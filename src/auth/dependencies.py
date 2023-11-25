@@ -3,7 +3,7 @@ from fastapi import Depends, HTTPException, Request
 from auth.exceptions import UnauthorizedError
 from auth.models import AdopterGoogleUser, ShelterGoogleUser
 
-from auth.services import get_user_from_token
+from auth.service import AuthService
 
 
 def auth_middleware(request: Request) -> Union[ShelterGoogleUser, AdopterGoogleUser]:
@@ -11,7 +11,9 @@ def auth_middleware(request: Request) -> Union[ShelterGoogleUser, AdopterGoogleU
         access_token = request.headers.get('Authorization')
         access_token = access_token.split(' ')[1]
 
-        return get_user_from_token(token=access_token)
+        service = AuthService()
+
+        return service.get_user_from_token(token=access_token)
     except AttributeError or IndexError:
         raise HTTPException(
             status_code=401,
