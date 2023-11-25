@@ -32,9 +32,11 @@ jobs:
 
       - name: Set Up App
         run: |
-          echo "SECRET_MANAGER_ENV=${{ steps.secrets.outputs.SECRET_MANAGER_ENV }}" >> .env
+          echo "SECRET_MANAGER_ENV=${{ steps.secrets.outputs.SECRET_MANAGER_ENV }}" >> .envs
+          cat .env
           mkdir -p storage
           echo "${{ steps.secrets.outputs.SECRET_MANAGER_SHELTER_CLIENT_SECRET }}" > storage/shelter_client_secret.json
+          cat storage/shelter_client_secret.json
 
       - name: Set up Python
         uses: actions/setup-python@v2
