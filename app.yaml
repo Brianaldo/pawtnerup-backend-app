@@ -2,6 +2,7 @@ runtime: python39
 
 instance_class: B1
 service: default
+entrypoint: cd src && gunicorn -w 1 -k uvicorn.workers.UvicornWorker main:app
 basic_scaling:
   max_instances: 1
   idle_timeout: 10m

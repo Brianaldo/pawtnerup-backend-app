@@ -1,9 +1,13 @@
 import os
-from dotenv import load_dotenv
+import pathlib
+import json
 
-load_dotenv()
+DATABASE_CONFIG_FILE = os.path.join(
+    pathlib.Path(__file__).parent.parent.parent.parent, "storage/database_config.json")
 
-POSTGRES_USER = os.getenv('POSTGRES_USER')
-POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD')
-POSTGRES_DB = os.getenv('POSTGRES_DB')
-POSTGRES_HOST = os.getenv('POSTGRES_HOST')
+with open(DATABASE_CONFIG_FILE) as f:
+    data = json.load(f)
+    POSTGRES_USER = data["user"]
+    POSTGRES_PASSWORD = data["password"]
+    POSTGRES_DB = data["database"]
+    POSTGRES_HOST = data["host"]
