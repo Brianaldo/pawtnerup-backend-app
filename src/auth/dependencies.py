@@ -1,34 +1,24 @@
 from typing import Annotated, Union
 from fastapi import Depends, HTTPException, Request
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from auth.exceptions import UnauthorizedError
 from auth.models import AdopterGoogleUser, ShelterGoogleUser
 
 from auth.service import AuthService
 
+security_scheme = HTTPBearer()
 
-def auth_middleware(request: Request) -> Union[ShelterGoogleUser, AdopterGoogleUser]:
+
+def auth_middleware(token: HTTPAuthorizationCredentials = Depends(security_scheme)) -> Union[ShelterGoogleUser, AdopterGoogleUser]:
     try:
-        access_token = request.headers.get('Authorization')
-        access_token = access_token.split(' ')[1]
-
         service = AuthService()
 
-        return service.get_user_from_token(token=access_token)
-    except AttributeError or IndexError:
-        raise HTTPException(
-            status_code=401,
-            detail="Could not find token."
-        )
-    except UnauthorizedError as e:
-        raise HTTPException(
-            status_code=401,
-            detail=str(e)
-        )
+        return service.get_user_from_token(token=token.credentials)
     except Exception as e:
         print(e)
         raise HTTPException(
             status_code=500,
-            detail="Could not authenticate."
+            detail=str(e)
         )
 
 
