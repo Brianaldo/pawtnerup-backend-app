@@ -1,0 +1,47 @@
+name: Deploy to GAE
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploying to Google Cloud
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Cloud SDK
+        uses: "google-github-actions/auth@v1"
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS_JSON }}
+
+      - id: secrets
+        name: Fetch Secrets from Secret Manager
+        uses: "google-github-actions/get-secretmanager-secrets@v1"
+        with:
+          secrets: |-
+            SECRET_MANAGER_ENV:${{ secrets.SECRET_MANAGER_ENV }}
+            SECRET_MANAGER_SHELTER_CLIENT_SECRET:${{ secrets.SECRET_MANAGER_SHELTER_CLIENT_SECRET }}
+
+      - name: Set Up App
+        run: |
+          - echo "SECRET_MANAGER_ENV=${{ steps.secrets.SECRET_MANAGER_ENV }}" >> .env
+          - mkdir -p storage
+          - echo "SECRET_MANAGER_SHELTER_CLIENT_SECRET=${{ steps.secrets.SECRET_MANAGER_SHELTER_CLIENT_SECRET }}" >> storage/shelter_client_secret.json
+
+      - name: Deploy to App Engine
+        id: deploy
+        uses: google-github-actions/deploy-appengine@v1
+        with:
+          deliverables: app.yaml
+          project_id: ${{ secrets.GCP_PROJECT }}
+
+      - name: Test
+        run: curl "${{ steps.deploy.outputs.url }}"
