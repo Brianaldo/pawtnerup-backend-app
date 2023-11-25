@@ -1,21 +1,48 @@
-from fastapi import HTTPException, Request
+from typing import Annotated, Union
+from fastapi import Depends, HTTPException, Request
+from auth.exceptions import UnauthorizedError
+from auth.models import AdopterGoogleUser, ShelterGoogleUser
 
 from auth.services import get_user_from_token
 
 
-def verify_token(request: Request) -> dict:
+def auth_middleware(request: Request) -> Union[ShelterGoogleUser, AdopterGoogleUser]:
     try:
         access_token = request.headers.get('Authorization')
         access_token = access_token.split(' ')[1]
-    except AttributeError:
+
+        return get_user_from_token(token=access_token)
+    except AttributeError or IndexError:
         raise HTTPException(
             status_code=401,
             detail="Could not find token."
         )
-    except IndexError:
+    except UnauthorizedError as e:
         raise HTTPException(
             status_code=401,
-            detail="Could not parse token."
+            detail=str(e)
+        )
+    except Exception as e:
+        print(e)
+        raise HTTPException(
+            status_code=500,
+            detail="Could not authenticate."
         )
 
-    return get_user_from_token(token=access_token)
+
+def authenticate_shelter(info: Union[ShelterGoogleUser, AdopterGoogleUser] = Depends(auth_middleware)) -> ShelterGoogleUser:
+    if info.role != 'SHELTER':
+        raise HTTPException(
+            status_code=403,
+            detail="Forbidden."
+        )
+    return info
+
+
+def authenticate_adopter(info: Union[ShelterGoogleUser, AdopterGoogleUser] = Depends(auth_middleware)) -> AdopterGoogleUser:
+    if info.role != 'ADOPTER':
+        raise HTTPException(
+            status_code=403,
+            detail="Forbidden."
+        )
+    return info

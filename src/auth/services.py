@@ -58,8 +58,9 @@ def generate_shelter_token(code: str) -> tuple[ShelterGoogleUser, str, str]:
         )
 
         return (user_data, credentials._id_token, credentials.refresh_token)
-    except ValueError:
-        raise UnauthorizedError('Could not verify token.')
+    except Exception as e:
+        print(e)
+        raise UnauthorizedError(e)
 
 
 def get_user_from_token(token: str) -> Union[ShelterGoogleUser, AdopterGoogleUser]:
@@ -92,8 +93,9 @@ def get_user_from_token(token: str) -> Union[ShelterGoogleUser, AdopterGoogleUse
             user_data = AdopterGoogleUser(**user_data.model_dump())
 
         return user_data
-    except ValueError:
-        raise UnauthorizedError('Could not verify token.')
+    except Exception as e:
+        print(e)
+        raise UnauthorizedError(e)
 
 
 def refresh_shelter_token(refresh_token: str) -> tuple[ShelterGoogleUser, str, str]:
@@ -131,5 +133,6 @@ def refresh_shelter_token(refresh_token: str) -> tuple[ShelterGoogleUser, str, s
         )
 
         return user_data, credentials.id_token, credentials.refresh_token
-    except ValueError:
-        raise UnauthorizedError('Could not refresh token.')
+    except Exception as e:
+        print(e)
+        raise UnauthorizedError(e)
