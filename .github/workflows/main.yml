@@ -2,7 +2,7 @@ name: Deploy to GAE
 
 on:
   push:
-    branches: [main]
+    branches: [main, chore/*]
   pull_request:
     branches: [main]
 
@@ -32,9 +32,9 @@ jobs:
 
       - name: Set Up App
         run: |
-          - echo "SECRET_MANAGER_ENV=${{ steps.secrets.SECRET_MANAGER_ENV }}" >> .env
-          - mkdir -p storage
-          - echo "SECRET_MANAGER_SHELTER_CLIENT_SECRET=${{ steps.secrets.SECRET_MANAGER_SHELTER_CLIENT_SECRET }}" >> storage/shelter_client_secret.json
+          echo "SECRET_MANAGER_ENV=${{ steps.secrets.outputs.SECRET_MANAGER_ENV }}" >> .env
+          mkdir -p storage
+          echo "${{ steps.secrets.outputs.SECRET_MANAGER_SHELTER_CLIENT_SECRET }}" > storage/shelter_client_secret.json
 
       - name: Deploy to App Engine
         id: deploy
