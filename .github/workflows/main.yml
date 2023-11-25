@@ -27,15 +27,14 @@ jobs:
         uses: "google-github-actions/get-secretmanager-secrets@v1"
         with:
           secrets: |-
-            SECRET_MANAGER_ENV:${{ secrets.SECRET_MANAGER_ENV }}
             SECRET_MANAGER_SHELTER_CLIENT_SECRET:${{ secrets.SECRET_MANAGER_SHELTER_CLIENT_SECRET }}
+            SECRET_MANAGER_DATABASE_CONFIG:${{ secrets.SECRET_MANAGER_DATABASE_CONFIG }}
 
       - name: Set Up App
         run: |
-          echo 'SECRET_MANAGER_ENV=${{ steps.secrets.outputs.SECRET_MANAGER_ENV }}' >> .env
           mkdir -p storage
           echo '${{ steps.secrets.outputs.SECRET_MANAGER_SHELTER_CLIENT_SECRET }}' > storage/shelter_client_secret.json
-          cat storage/shelter_client_secret.json
+          echo '${{ steps.secrets.outputs.SECRET_MANAGER_DATABASE_CONFIG }}' > storage/database_config.json
 
       - name: Set up Python
         uses: actions/setup-python@v2
