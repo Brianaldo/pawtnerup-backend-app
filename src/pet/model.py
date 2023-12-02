@@ -45,4 +45,9 @@ class CreatePetRequestBody(BaseModel):
     estimate_age: float
     sterilization_status: SterilizationEnum
     rescue_story: Union[constr(strip_whitespace=True), None]
-    media: list[str]
+    media: list[str] = []
+
+
+class CreatePetResponseBody(BaseModel):
+    pet: Pet
+    post_media_urls: list[str]

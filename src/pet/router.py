@@ -4,7 +4,7 @@ from _common.response import GenericListResponse, GenericObjectResponse
 from auth.dependencies import authenticate_shelter
 
 from auth.models import ShelterGoogleUser
-from pet.model import CreatePetRequestBody, Pet
+from pet.model import CreatePetRequestBody, CreatePetResponseBody, Pet
 from pet.service import PetService
 
 
@@ -14,21 +14,24 @@ router = APIRouter(
 )
 
 
-@router.post("", response_model=GenericObjectResponse[Pet])
+@router.post("", response_model=GenericObjectResponse[CreatePetResponseBody])
 async def create_pet(
     body: CreatePetRequestBody,
     user_context: ShelterGoogleUser = Depends(authenticate_shelter)
 ):
     try:
         service = PetService()
-        pet = service.create_pet(
+        (pet, urls) = service.create_pet(
             shelter_email=user_context.email,
             **body.model_dump()
         )
 
         return GenericObjectResponse(
             message="Created pet successfully!",
-            data=pet
+            data=CreatePetResponseBody(
+                pet=pet,
+                post_media_urls=urls
+            )
         )
     except Exception as e:
         print(e)
