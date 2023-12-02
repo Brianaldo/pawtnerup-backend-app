@@ -1,14 +1,14 @@
-from typing import Union
+from typing import Optional, Union
 from pydantic import BaseModel
 
 
 class GoogleUser(BaseModel):
     id: str
     email: str
-    name: str
-    picture: str
-    given_name: str
-    family_name: str
+    name: Optional[str]
+    picture: Optional[str]
+    given_name: Optional[str]
+    family_name: Optional[str]
 
 
 class ShelterGoogleUser(GoogleUser):

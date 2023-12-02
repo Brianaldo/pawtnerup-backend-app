@@ -9,6 +9,7 @@ class ShelterEntity(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(50))
     email = Column(String(50), unique=True)
+    contact_email = Column(String(50))
     address = Column(String(50))
     phone_number = Column(String(50))
 
@@ -17,6 +18,7 @@ class ShelterEntity(Base):
             id=self.id,
             name=self.name,
             email=self.email,
+            contact_email=self.contact_email,
             address=self.address,
             phone_number=self.phone_number,
         )
