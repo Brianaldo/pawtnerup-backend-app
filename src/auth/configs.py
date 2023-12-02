@@ -5,7 +5,12 @@ import json
 """
 Google OAuth 2.0 Configuration for Adopter Client
 """
-GOOGLE_ADOPTER_CLIENT_ID = ""
+ADOPTER_CLIENT_SECRET_FILE = os.path.join(
+    pathlib.Path(__file__).parent.parent.parent, "storage/adopter_client_secret.json")
+
+with open(ADOPTER_CLIENT_SECRET_FILE) as f:
+    data = json.load(f)
+    GOOGLE_ADOPTER_CLIENT_ID = data["installed"]["client_id"]
 
 
 """

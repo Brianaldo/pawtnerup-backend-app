@@ -22,7 +22,7 @@ class Shelter(BaseModel):
 
 
 class CreateShelterRequestBody(BaseModel):
-    name: constr(strip_whitespace=True)
+    name: constr(strip_whitespace=True, min_length=1, max_length=50)
     phone_number: PhoneNumber
     contact_email: EmailStr
-    address: constr(strip_whitespace=True)
+    address: constr(strip_whitespace=True, min_length=1, max_length=50)

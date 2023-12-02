@@ -28,6 +28,7 @@ jobs:
         with:
           secrets: |-
             SECRET_MANAGER_SHELTER_CLIENT_SECRET:${{ secrets.SECRET_MANAGER_SHELTER_CLIENT_SECRET }}
+            SECRET_MANAGER_ADOPTER_CLIENT_SECRET:${{ secrets.SECRET_MANAGER_ADOPTER_CLIENT_SECRET }}
             SECRET_MANAGER_DATABASE_CONFIG:${{ secrets.SECRET_MANAGER_DATABASE_CONFIG }}
             SECRET_MANAGER_STORAGE_CONFIG:${{ secrets.SECRET_MANAGER_STORAGE_CONFIG }}
 
@@ -35,6 +36,7 @@ jobs:
         run: |
           mkdir -p storage
           echo '${{ steps.secrets.outputs.SECRET_MANAGER_SHELTER_CLIENT_SECRET }}' > storage/shelter_client_secret.json
+          echo '${{ steps.secrets.outputs.SECRET_MANAGER_ADOPTER_CLIENT_SECRET }}' > storage/adopter_client_secret.json
           echo '${{ steps.secrets.outputs.SECRET_MANAGER_DATABASE_CONFIG }}' > storage/database_config.json
           echo '${{ steps.secrets.outputs.SECRET_MANAGER_STORAGE_CONFIG }}' > storage/cloud_storage_config.json
 

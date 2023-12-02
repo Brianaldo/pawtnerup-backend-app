@@ -9,7 +9,7 @@ from pet.service import PetService
 
 
 router = APIRouter(
-    prefix="/shelters/me/pets",
+    prefix="/shelters/pets",
     tags=["pets"]
 )
 
@@ -41,7 +41,7 @@ async def create_pet(
         )
 
 
-@router.get("", response_model=GenericListResponse[Pet])
+@router.get("/me", response_model=GenericListResponse[Pet])
 async def get_pets(
     user_context: ShelterGoogleUser = Depends(authenticate_shelter)
 ):
