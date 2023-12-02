@@ -14,6 +14,11 @@ def auth_middleware(token: HTTPAuthorizationCredentials = Depends(security_schem
         service = AuthService()
 
         return service.get_user_from_token(token=token.credentials)
+    except UnauthorizedError as e:
+        raise HTTPException(
+            status_code=401,
+            detail=str(e)
+        )
     except Exception as e:
         print(e)
         raise HTTPException(

@@ -1,9 +1,9 @@
 from _common.exceptions import ConflictException, NotFoundException
 
 
-class ShelterNotFound(NotFoundException):
+class BreedNotFound(NotFoundException):
     pass
 
 
-class ShelterAlreadyExists(ConflictException):
+class BreedAlreadyExists(ConflictException):
     pass

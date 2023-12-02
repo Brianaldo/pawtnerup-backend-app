@@ -66,10 +66,10 @@ class AuthService:
             user_data = GoogleUser(
                 id=payload['sub'],
                 email=payload['email'],
-                name=payload['name'],
-                picture=payload['picture'],
-                given_name=payload['given_name'],
-                family_name=payload['family_name'],
+                name=payload['name'] if 'name' in payload else None,
+                picture=payload['picture'] if 'picture' in payload else None,
+                given_name=payload['given_name'] if 'given_name' in payload else None,
+                family_name=payload['family_name'] if 'family_name' in payload else None,
             )
             if payload['aud'] == GOOGLE_SHELTER_CLIENT_ID:
                 user_data = ShelterGoogleUser(**user_data.model_dump())
@@ -78,6 +78,8 @@ class AuthService:
 
             return user_data
         except Exception as e:
+            if isinstance(e, ValueError):
+                raise UnauthorizedError('Expired token.')
             print(e)
             raise UnauthorizedError(e)
 
@@ -102,10 +104,10 @@ class AuthService:
             user_data = ShelterGoogleUser(
                 id=payload['sub'],
                 email=payload['email'],
-                name=payload['name'],
-                picture=payload['picture'],
-                given_name=payload['given_name'],
-                family_name=payload['family_name']
+                name=payload['name'] if 'name' in payload else None,
+                picture=payload['picture'] if 'picture' in payload else None,
+                given_name=payload['given_name'] if 'given_name' in payload else None,
+                family_name=payload['family_name'] if 'family_name' in payload else None,
             )
 
             return user_data, credentials.id_token, credentials.refresh_token

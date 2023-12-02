@@ -5,10 +5,10 @@ from pydantic import BaseModel
 class GoogleUser(BaseModel):
     id: str
     email: str
-    name: Optional[str]
-    picture: Optional[str]
-    given_name: Optional[str]
-    family_name: Optional[str]
+    name: Union[str, None]
+    picture: Union[str, None]
+    given_name: Union[str, None]
+    family_name: Union[str, None]
 
 
 class ShelterGoogleUser(GoogleUser):

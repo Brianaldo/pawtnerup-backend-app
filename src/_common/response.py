@@ -1,11 +1,10 @@
 from typing import Generic, TypeVar
 from pydantic import BaseModel
-from pydantic.generics import GenericModel
 
 M = TypeVar("M", bound=BaseModel)
 
 
-class BaseGenericResponse(GenericModel):
+class BaseGenericResponse(BaseModel):
     message: str
 
 
