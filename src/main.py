@@ -3,6 +3,7 @@ import os
 from fastapi import FastAPI
 from auth.router import router as auth_router
 from shelter.router import router as shelter_router
+from adopter.router import router as adopter_router
 from breed.router import router as breed_router
 from pet.router import router as pet_router
 from _infrastructure.database.engine import db_engine
@@ -19,6 +20,7 @@ async def root():
 
 app.include_router(auth_router)
 app.include_router(shelter_router)
+app.include_router(adopter_router)
 app.include_router(breed_router)
 app.include_router(pet_router)
 
