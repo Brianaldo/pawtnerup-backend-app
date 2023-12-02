@@ -3,8 +3,8 @@ name: Deploy to GAE
 on:
   push:
     branches: [main, chore/*]
-  pull_request:
-    branches: [main]
+  # pull_request:
+  #   branches: [main]
 
   workflow_dispatch:
 
@@ -29,12 +29,14 @@ jobs:
           secrets: |-
             SECRET_MANAGER_SHELTER_CLIENT_SECRET:${{ secrets.SECRET_MANAGER_SHELTER_CLIENT_SECRET }}
             SECRET_MANAGER_DATABASE_CONFIG:${{ secrets.SECRET_MANAGER_DATABASE_CONFIG }}
+            SECRET_MANAGER_STORAGE_CONFIG:${{ secrets.SECRET_MANAGER_STORAGE_CONFIG }}
 
       - name: Set Up App
         run: |
           mkdir -p storage
           echo '${{ steps.secrets.outputs.SECRET_MANAGER_SHELTER_CLIENT_SECRET }}' > storage/shelter_client_secret.json
           echo '${{ steps.secrets.outputs.SECRET_MANAGER_DATABASE_CONFIG }}' > storage/database_config.json
+          echo '${{ steps.secrets.outputs.SECRET_MANAGER_STORAGE_CONFIG }}' > storage/cloud_storage_config.json
 
       - name: Set up Python
         uses: actions/setup-python@v2

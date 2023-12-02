@@ -20,7 +20,8 @@ class ShelterService:
             raise e
 
     def get_shelters(self, **kwargs: ShelterTyped) -> list[Shelter]:
-        return self.shelter_repo.get_by_filter(**kwargs).map(lambda shelter: shelter.to_model())
+        shelters = self.shelter_repo.get_by_filter(**kwargs)
+        return [shelter.to_model() for shelter in shelters]
 
     def create_shelter(self, **kwargs: ShelterTyped) -> Shelter:
         try:

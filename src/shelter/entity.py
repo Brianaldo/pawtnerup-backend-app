@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String
 from _infrastructure.database import Base
+# from pet.entity import PetEntity
 from shelter.model import Shelter
+from sqlalchemy.orm import relationship, Mapped
 
 
 class ShelterEntity(Base):
@@ -12,6 +14,8 @@ class ShelterEntity(Base):
     contact_email = Column(String(50))
     address = Column(String(50))
     phone_number = Column(String(50))
+
+    pets: Mapped[list["PetEntity"]] = relationship(back_populates="shelter")
 
     def to_model(self) -> Shelter:
         return Shelter(
