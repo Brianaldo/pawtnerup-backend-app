@@ -20,11 +20,11 @@ class AdopterGoogleUser(GoogleUser):
 
 
 class LoginCallbackRequestBody(BaseModel):
-    authuser: str
+    authuser: Union[str, None]
     code: str
-    hd: str
-    prompt: str
-    scope: str
+    hd: Union[str, None]
+    prompt: Union[str, None]
+    scope: Union[str, None]
 
 
 class RefreshTokenRequestBody(BaseModel):
