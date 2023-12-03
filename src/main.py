@@ -8,11 +8,23 @@ from breed.router import router as breed_router
 from pet.router import router as pet_router
 from _infrastructure.database.engine import db_engine
 from _infrastructure.database.base_model import Base
+from fastapi.middleware.cors import CORSMiddleware
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 app = FastAPI()
 
+origins = [
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 async def root():
