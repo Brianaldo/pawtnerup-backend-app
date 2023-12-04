@@ -10,6 +10,7 @@ class AdopterEntity(Base):
     name = Column(String(50))
     email = Column(String(50), unique=True)
     bio = Column(String(100))
+    profile_picture = Column(String(200))
 
     def to_model(self) -> Adopter:
         return Adopter(
@@ -17,6 +18,7 @@ class AdopterEntity(Base):
             name=self.name,
             email=self.email,
             bio=self.bio,
+            profile_picture=self.profile_picture
         )
 
     def __repr__(self):
