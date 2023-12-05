@@ -7,13 +7,13 @@ from sqlalchemy.orm import relationship, Mapped
 class AdopterEntity(Base):
     __tablename__ = "adopters"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(String(30), primary_key=True)
     name = Column(String(50))
     email = Column(String(50), unique=True)
     bio = Column(String(100))
     profile_picture = Column(String(200))
     questionnaire: Mapped["QuestionnaireEntity"] = relationship(
-        back_populates="adopter")
+        back_populates="adopter", cascade='all, delete')
 
     def to_model(self) -> Adopter:
         return Adopter(

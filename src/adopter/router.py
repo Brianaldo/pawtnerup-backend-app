@@ -38,34 +38,34 @@ async def get_adopter(user_context: AdopterGoogleUser = Depends(authenticate_ado
         )
 
 
-@router.post("", response_model=GenericObjectResponse[Adopter])
-async def create_adopter(
-    body: CreateAdopterRequestBody,
-    user_context: AdopterGoogleUser = Depends(authenticate_adopter)
-):
-    try:
-        service = AdopterService()
-        adopter = service.create_adopter(
-            name=user_context.name or "",
-            email=user_context.email,
-            bio=body.bio,
-            profile_picture=user_context.picture or ""
-        )
-        return GenericObjectResponse(
-            message="Created adopter successfully!",
-            data=adopter
-        )
-    except AdopterAlreadyExists:
-        raise HTTPException(
-            status_code=400,
-            detail="Adopter already exists."
-        )
-    except Exception as e:
-        print(e)
-        raise HTTPException(
-            status_code=500,
-            detail="Could not create adopter."
-        )
+# @router.post("", response_model=GenericObjectResponse[Adopter])
+# async def create_adopter(
+#     body: CreateAdopterRequestBody,
+#     user_context: AdopterGoogleUser = Depends(authenticate_adopter)
+# ):
+#     try:
+#         service = AdopterService()
+#         adopter = service.create_adopter(
+#             name=user_context.name or "",
+#             email=user_context.email,
+#             bio=body.bio,
+#             profile_picture=user_context.picture or ""
+#         )
+#         return GenericObjectResponse(
+#             message="Created adopter successfully!",
+#             data=adopter
+#         )
+#     except AdopterAlreadyExists:
+#         raise HTTPException(
+#             status_code=400,
+#             detail="Adopter already exists."
+#         )
+#     except Exception as e:
+#         print(e)
+#         raise HTTPException(
+#             status_code=500,
+#             detail="Could not create adopter."
+#         )
 
 
 @router.post("/questionnaire", response_model=GenericObjectResponse[Questionnaire])
@@ -74,14 +74,28 @@ async def create_questionnaire(
     user_context: AdopterGoogleUser = Depends(authenticate_adopter)
 ):
     try:
+        service = AdopterService()
+        adopter = service.create_adopter(
+            id=user_context.id,
+            name=user_context.name or "",
+            email=user_context.email,
+            bio=body.bio,
+            profile_picture=user_context.picture or ""
+        )
+
         service = QuestionnaireService()
         questionnaire = service.create_questionnaire(
-            adopter_email=user_context.email,
+            adopter=adopter,
             **body.model_dump()
         )
         return GenericObjectResponse(
             message="Created questionnaire successfully!",
             data=questionnaire
+        )
+    except AdopterAlreadyExists:
+        raise HTTPException(
+            status_code=400,
+            detail="Adopter already exists."
         )
     except AdopterNotFound:
         raise HTTPException(

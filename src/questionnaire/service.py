@@ -9,8 +9,5 @@ class QuestionnaireService:
         self.questionnaire_repository = QuestionnaireRepository()
         self.adopter_service = AdopterService()
 
-    def create_questionnaire(self, adopter_email: str, **kwargs: QuestionnaireTyped) -> Questionnaire:
-        adopter = self.adopter_service.get_adopter(
-            email=adopter_email
-        )
-        return self.questionnaire_repository.create(adopter=adopter, **kwargs).to_model()
+    def create_questionnaire(self, **kwargs: QuestionnaireTyped) -> Questionnaire:
+        return self.questionnaire_repository.create(**kwargs).to_model()

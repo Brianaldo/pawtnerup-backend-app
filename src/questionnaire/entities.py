@@ -1,6 +1,6 @@
 import enum
 from sqlalchemy import Column, Enum, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship, Mapped
+from sqlalchemy.orm import relationship, Mapped, backref
 from _infrastructure.database import Base
 from breed.model import BreedSizeEnum
 from pet.model import AgeEnum, GenderEnum
@@ -11,7 +11,8 @@ class QuestionnaireEntity(Base):
     __tablename__ = "questionnaires"
 
     id = Column(Integer, primary_key=True)
-    adopter_id = Column(Integer, ForeignKey("adopters.id"), unique=True)
+    adopter_id = Column(String(50), ForeignKey(
+        "adopters.id", ondelete='CASCADE'), unique=True)
     adopter: Mapped["AdopterEntity"] = relationship(
         back_populates="questionnaire")
     pet_personality: Mapped["PetPersonalityQuestionnaireEntity"] = relationship(

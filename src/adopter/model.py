@@ -4,7 +4,7 @@ from pydantic import BaseModel, constr
 
 
 class AdopterTyped(TypedDict, total=False):
-    id: int
+    id: str
     name: str
     email: str
     bio: str
@@ -12,7 +12,7 @@ class AdopterTyped(TypedDict, total=False):
 
 
 class Adopter(BaseModel):
-    id: int
+    id: str
     name: str
     email: str
     bio: str
