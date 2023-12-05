@@ -6,6 +6,8 @@ from adopter.model import Adopter, CreateAdopterRequestBody
 from adopter.service import AdopterService
 from auth.dependencies import authenticate_adopter
 from auth.models import AdopterGoogleUser
+from questionnaire.model import CreateQuestionnaire, Questionnaire
+from questionnaire.service import QuestionnaireService
 
 
 router = APIRouter(
@@ -63,4 +65,32 @@ async def create_adopter(
         raise HTTPException(
             status_code=500,
             detail="Could not create adopter."
+        )
+
+
+@router.post("/questionnaire", response_model=GenericObjectResponse[Questionnaire])
+async def create_questionnaire(
+    body: CreateQuestionnaire,
+    user_context: AdopterGoogleUser = Depends(authenticate_adopter)
+):
+    try:
+        service = QuestionnaireService()
+        questionnaire = service.create_questionnaire(
+            adopter_email=user_context.email,
+            **body.model_dump()
+        )
+        return GenericObjectResponse(
+            message="Created questionnaire successfully!",
+            data=questionnaire
+        )
+    except AdopterNotFound:
+        raise HTTPException(
+            status_code=403,
+            detail="Unregistered adopter."
+        )
+    except Exception as e:
+        print(e)
+        raise HTTPException(
+            status_code=500,
+            detail="Could not create questionnaire."
         )

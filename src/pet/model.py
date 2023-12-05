@@ -12,6 +12,19 @@ class GenderEnum(enum.Enum):
 class SterilizationEnum(enum.Enum):
     NEUTERED = "NEUTERED"
     SPAYED = "SPAYED"
+    NOT_STERILIZED = "NOT_STERILIZED"
+    VACCINATED = "VACCINATED"
+
+
+class AgeEnum(enum.Enum):
+    # 0 - 6 months
+    PUPPY = "PUPPY"
+    # 6 - 12 months
+    YOUNG = "YOUNG"
+    # 1 - 7 years
+    ADULT = "ADULT"
+    # > 7 years
+    SENIOR = "SENIOR"
 
 
 class PetTyped(TypedDict, total=False):
