@@ -1,6 +1,5 @@
 from sqlalchemy import Column, Integer, String
 from _infrastructure.database import Base
-# from pet.entity import PetEntity
 from shelter.model import Shelter
 from sqlalchemy.orm import relationship, Mapped
 

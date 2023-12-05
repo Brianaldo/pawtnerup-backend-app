@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String
 from _infrastructure.database.base_model import Base
 from adopter.model import Adopter
+from sqlalchemy.orm import relationship, Mapped
 
 
 class AdopterEntity(Base):
@@ -11,6 +12,8 @@ class AdopterEntity(Base):
     email = Column(String(50), unique=True)
     bio = Column(String(100))
     profile_picture = Column(String(200))
+    questionnaire: Mapped["QuestionnaireEntity"] = relationship(
+        back_populates="adopter")
 
     def to_model(self) -> Adopter:
         return Adopter(
