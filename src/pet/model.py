@@ -39,6 +39,17 @@ class PetTyped(TypedDict, total=False):
     media: list[str]
 
 
+class PetResponse(BaseModel):
+    id: int
+    name: str
+    gender: GenderEnum
+    breed: str
+    estimate_age: float
+    sterilization_status: SterilizationEnum
+    rescue_story: Union[str, None]
+    media: list[str]
+
+
 class Pet(BaseModel):
     id: int
     name: str
@@ -49,6 +60,19 @@ class Pet(BaseModel):
     sterilization_status: SterilizationEnum
     rescue_story: Union[str, None]
     media: list[str]
+
+    def to_response(self) -> PetResponse:
+        estimate_age = round((date.today() - self.born_date).days / 365.24, 1)
+        return PetResponse(
+            id=self.id,
+            name=self.name,
+            gender=self.gender,
+            breed=self.breed,
+            estimate_age=estimate_age,
+            sterilization_status=self.sterilization_status,
+            rescue_story=self.rescue_story,
+            media=self.media,
+        )
 
 
 class CreatePetRequestBody(BaseModel):
@@ -62,5 +86,5 @@ class CreatePetRequestBody(BaseModel):
 
 
 class CreatePetResponseBody(BaseModel):
-    pet: Pet
+    pet: PetResponse
     post_media_urls: list[str]

@@ -4,7 +4,7 @@ from _common.response import GenericListResponse, GenericObjectResponse
 from auth.dependencies import authenticate_shelter
 
 from auth.models import ShelterGoogleUser
-from pet.model import CreatePetRequestBody, CreatePetResponseBody, Pet
+from pet.model import CreatePetRequestBody, CreatePetResponseBody, Pet, PetResponse
 from pet.service import PetService
 
 
@@ -29,7 +29,7 @@ async def create_pet(
         return GenericObjectResponse(
             message="Created pet successfully!",
             data=CreatePetResponseBody(
-                pet=pet,
+                pet=pet.to_response(),
                 post_media_urls=urls
             )
         )
@@ -41,7 +41,7 @@ async def create_pet(
         )
 
 
-@router.get("/me", response_model=GenericListResponse[Pet])
+@router.get("/me", response_model=GenericListResponse[PetResponse])
 async def get_pets(
     user_context: ShelterGoogleUser = Depends(authenticate_shelter)
 ):
@@ -50,6 +50,7 @@ async def get_pets(
         pets = service.get_pet_by_shelter(
             shelter_email=user_context.email
         )
+        pets = [pet.to_response() for pet in pets]
 
         return GenericListResponse(
             message="Retrieved pets successfully!",
