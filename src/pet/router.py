@@ -4,7 +4,7 @@ from _common.response import GenericListResponse, GenericObjectResponse
 from auth.dependencies import authenticate_shelter
 
 from auth.models import ShelterGoogleUser
-from pet.model import CreatePetRequestBody, CreatePetResponseBody, Pet, PetResponse
+from pet.model import CreatePetRequestBody, CreatePetResponseBody, Pet, PetResponse, PetTrimmedResponse
 from pet.service import PetService
 
 
@@ -41,7 +41,7 @@ async def create_pet(
         )
 
 
-@router.get("/me", response_model=GenericListResponse[PetResponse])
+@router.get("/me", response_model=GenericListResponse[PetTrimmedResponse])
 async def get_pets(
     user_context: ShelterGoogleUser = Depends(authenticate_shelter)
 ):
@@ -50,7 +50,7 @@ async def get_pets(
         pets = service.get_pet_by_shelter(
             shelter_email=user_context.email
         )
-        pets = [pet.to_response() for pet in pets]
+        pets = [pet.to_trimmed_response() for pet in pets]
 
         return GenericListResponse(
             message="Retrieved pets successfully!",
@@ -66,4 +66,33 @@ async def get_pets(
         raise HTTPException(
             status_code=500,
             detail="Could not retrieve pets."
+        )
+
+
+@router.get("/{pet_id}", response_model=GenericObjectResponse[PetResponse])
+async def get_pet(
+    pet_id: str,
+    user_context: ShelterGoogleUser = Depends(authenticate_shelter)
+):
+    try:
+        service = PetService()
+        pet = service.get_pet(
+            shelter_email=user_context.email,
+            pet_id=pet_id
+        )
+
+        return GenericObjectResponse(
+            message="Retrieved pet successfully!",
+            data=pet.to_response()
+        )
+    except NotFoundException as e:
+        raise HTTPException(
+            status_code=404,
+            detail=str(e)
+        )
+    except Exception as e:
+        print(e)
+        raise HTTPException(
+            status_code=500,
+            detail="Could not retrieve pet."
         )
