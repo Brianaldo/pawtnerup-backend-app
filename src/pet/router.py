@@ -4,7 +4,7 @@ from _common.response import GenericListResponse, GenericObjectResponse
 from auth.dependencies import authenticate_shelter
 
 from auth.models import ShelterGoogleUser
-from pet.model import CreatePetRequestBody, CreatePetResponseBody, Pet, PetResponse, PetTrimmedResponse
+from pet.model import CreatePetRequestBody, CreatePetResponseBody, Pet, PetMediaRequestBody, PetResponse, PetTrimmedResponse
 from pet.service import PetService
 
 
@@ -95,4 +95,74 @@ async def get_pet(
         raise HTTPException(
             status_code=500,
             detail="Could not retrieve pet."
+        )
+
+
+@router.put("/{pet_id}", response_model=GenericObjectResponse[PetResponse])
+async def update_pet(
+    pet_id: str,
+    body: CreatePetRequestBody,
+    user_context: ShelterGoogleUser = Depends(authenticate_shelter)
+):
+    try:
+        service = PetService()
+        pet = service.update_pet(
+            shelter_email=user_context.email,
+            pet_id=pet_id,
+            **body.model_dump()
+        )
+
+        return GenericObjectResponse(
+            message="Updated pet successfully!",
+            data=pet.to_response()
+        )
+    except NotFoundException as e:
+        raise HTTPException(
+            status_code=404,
+            detail=str(e)
+        )
+    except Exception as e:
+        print(e)
+        raise HTTPException(
+            status_code=500,
+            detail="Could not update pet."
+        )
+
+
+@router.put("/{pet_id}/media", response_model=GenericObjectResponse[CreatePetResponseBody])
+async def update_pet_media(
+    pet_id: str,
+    body: list[PetMediaRequestBody],
+    user_context: ShelterGoogleUser = Depends(authenticate_shelter)
+):
+    try:
+        service = PetService()
+        (pet, urls) = service.update_media(
+            shelter_email=user_context.email,
+            pet_id=pet_id,
+            media=body
+        )
+
+        return GenericObjectResponse(
+            message="Updated pet media successfully!",
+            data=CreatePetResponseBody(
+                pet=pet.to_response(),
+                post_media_urls=urls
+            )
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=400,
+            detail=str(e)
+        )
+    except NotFoundException as e:
+        raise HTTPException(
+            status_code=404,
+            detail=str(e)
+        )
+    except Exception as e:
+        print(e)
+        raise HTTPException(
+            status_code=500,
+            detail="Could not update pet media."
         )
