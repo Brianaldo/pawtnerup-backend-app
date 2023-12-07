@@ -4,7 +4,7 @@ from _common.response import GenericListResponse, GenericObjectResponse
 from auth.dependencies import authenticate_shelter
 
 from auth.models import ShelterGoogleUser
-from pet.model import CreatePetRequestBody, CreatePetResponseBody, Pet, PetMediaRequestBody, PetResponse, PetTrimmedResponse
+from pet.model import CreatePetRequestBody, CreatePetResponseBody, DeletedResponse, Pet, PetMediaRequestBody, PetResponse, PetTrimmedResponse
 from pet.service import PetService
 
 
@@ -165,4 +165,35 @@ async def update_pet_media(
         raise HTTPException(
             status_code=500,
             detail="Could not update pet media."
+        )
+
+
+@router.delete("/{pet_id}", response_model=GenericObjectResponse[DeletedResponse])
+async def delete_pet(
+    pet_id: str,
+    user_context: ShelterGoogleUser = Depends(authenticate_shelter)
+):
+    try:
+        service = PetService()
+        deleted_id = service.delete_pet(
+            shelter_email=user_context.email,
+            pet_id=pet_id
+        )
+
+        return GenericObjectResponse(
+            message="Deleted pet successfully!",
+            data=DeletedResponse(
+                id=deleted_id
+            )
+        )
+    except NotFoundException as e:
+        raise HTTPException(
+            status_code=404,
+            detail=str(e)
+        )
+    except Exception as e:
+        print(e)
+        raise HTTPException(
+            status_code=500,
+            detail="Could not delete pet."
         )

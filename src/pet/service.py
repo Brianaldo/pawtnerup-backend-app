@@ -1,5 +1,6 @@
 from datetime import date
 from typing import Union
+from _common.exceptions import NotFoundException
 from _infrastructure.database.exceptions import NotFoundError
 from _infrastructure.object_storage.client import ObjectStorageClient
 from pet.model import Pet, PetMediaRequestBody, PetMediaTypeRequest, PetTyped
@@ -59,7 +60,7 @@ class PetService:
 
             return pet.to_model()
         except NotFoundError:
-            raise NotFoundError("Shelter or pet not found")
+            raise NotFoundException("Shelter or pet not found")
         except Exception as e:
             print(e)
             raise e
@@ -126,7 +127,34 @@ class PetService:
         except ValueError as e:
             raise ValueError(e or "Media not found")
         except NotFoundError as e:
-            raise NotFoundError(e or "Shelter or pet not found")
+            raise NotFoundException(e or "Shelter or pet not found")
+        except Exception as e:
+            print(e)
+            raise e
+
+    def delete_pet(self, shelter_email: str, pet_id: int) -> int:
+        try:
+            shelter = self.shelter_repo.get_one_by_filter(
+                email=shelter_email
+            )
+            pet = self.pet_repo.get_one_by_filter(
+                shelter_id=shelter.id,
+                id=pet_id
+            )
+
+            for i in range(len(pet.media)):
+                try:
+                    self.storage_client.delete_file(pet.media[i])
+                except Exception as e:
+                    print(e)
+
+            self.pet_repo.delete(
+                id=pet.id
+            )
+
+            return pet.id
+        except NotFoundError:
+            raise NotFoundException("Shelter or pet not found")
         except Exception as e:
             print(e)
             raise e

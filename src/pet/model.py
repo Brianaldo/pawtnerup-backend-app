@@ -127,3 +127,7 @@ class PetMediaRequestBody(BaseModel):
 
 class UpdatePetMediaRequestBody(BaseModel):
     media: list[PetMediaRequestBody] = []
+
+
+class DeletedResponse(BaseModel):
+    id: int
