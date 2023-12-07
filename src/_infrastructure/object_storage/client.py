@@ -28,6 +28,17 @@ class ObjectStorageClient:
             )
         )
 
+    def put_presigned_url(self, file_name: str) -> str:
+        blob = self.bucket.blob(file_name)
+        return blob.generate_signed_url(
+            version='v4',
+            expiration=datetime.timedelta(minutes=1),
+            method='PUT',
+            headers={
+                "x-goog-content-length-range": "0,104857600"
+            }
+        )
+
     def delete_file(self, file_name: str):
         blob = self.bucket.blob(file_name)
         blob.delete()

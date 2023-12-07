@@ -3,6 +3,8 @@ import enum
 from typing import TypedDict, Union
 from pydantic import BaseModel, constr
 
+from _infrastructure.object_storage.configs import CLOUD_STORAGE_BUCKET
+
 
 class GenderEnum(enum.Enum):
     MALE = "MALE"
@@ -39,6 +41,15 @@ class PetTyped(TypedDict, total=False):
     media: list[str]
 
 
+class PetTrimmedResponse(BaseModel):
+    id: int
+    name: str
+    gender: GenderEnum
+    breed: str
+    estimate_age: float
+    sterilization_status: SterilizationEnum
+
+
 class PetResponse(BaseModel):
     id: int
     name: str
@@ -71,7 +82,19 @@ class Pet(BaseModel):
             estimate_age=estimate_age,
             sterilization_status=self.sterilization_status,
             rescue_story=self.rescue_story,
-            media=self.media,
+            media=map(
+                lambda url: "https://storage.googleapis.com/{}/{}".format(CLOUD_STORAGE_BUCKET, url), self.media),
+        )
+
+    def to_trimmed_response(self) -> PetTrimmedResponse:
+        estimate_age = round((date.today() - self.born_date).days / 365.24, 1)
+        return PetTrimmedResponse(
+            id=self.id,
+            name=self.name,
+            gender=self.gender,
+            breed=self.breed,
+            estimate_age=estimate_age,
+            sterilization_status=self.sterilization_status,
         )
 
 
@@ -87,4 +110,24 @@ class CreatePetRequestBody(BaseModel):
 
 class CreatePetResponseBody(BaseModel):
     pet: PetResponse
-    post_media_urls: list[str]
+    post_media_urls: list[Union[str, None]]
+
+
+class PetMediaTypeRequest(enum.Enum):
+    DELETE = "DELETE"
+    ADD = "ADD"
+    UPDATE = "UPDATE"
+    DO_NOTHING = "DO_NOTHING"
+
+
+class PetMediaRequestBody(BaseModel):
+    type: PetMediaTypeRequest
+    filename: str
+
+
+class UpdatePetMediaRequestBody(BaseModel):
+    media: list[PetMediaRequestBody] = []
+
+
+class DeletedResponse(BaseModel):
+    id: int

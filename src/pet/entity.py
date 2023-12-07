@@ -1,9 +1,6 @@
 from sqlalchemy import ARRAY, Column, Date, ForeignKey, Integer, String, Enum, Text
 from _infrastructure.database import Base
-from _infrastructure.object_storage.configs import CLOUD_STORAGE_BUCKET
-# from breed.entity import BreedEntity
 from pet.model import GenderEnum, Pet, SterilizationEnum
-# from shelter.entity import ShelterEntity
 from sqlalchemy.orm import relationship, Mapped
 
 
@@ -33,6 +30,5 @@ class PetEntity(Base):
             born_date=self.born_date,
             sterilization_status=self.sterilization_status,
             rescue_story=self.rescue_story,
-            media=map(
-                lambda url: "https://storage.googleapis.com/{}/{}".format(CLOUD_STORAGE_BUCKET, url), self.media),
+            media=self.media,
         )
