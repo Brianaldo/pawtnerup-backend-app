@@ -6,6 +6,8 @@ from adopter.model import Adopter, CreateAdopterRequestBody
 from adopter.service import AdopterService
 from auth.dependencies import authenticate_adopter
 from auth.models import AdopterGoogleUser
+from preference.model import AdopterPreference, CreateAdopterPreferenceRequestBody
+from preference.service import AdopterPreferenceService
 from questionnaire.model import CreateQuestionnaire, Questionnaire
 from questionnaire.service import QuestionnaireService
 
@@ -107,4 +109,57 @@ async def create_questionnaire(
         raise HTTPException(
             status_code=500,
             detail="Could not create questionnaire."
+        )
+
+
+@router.get("/me/preferences", response_model=GenericObjectResponse[Adopter])
+async def get_adopter(user_context: AdopterGoogleUser = Depends(authenticate_adopter)):
+    try:
+        service = AdopterService()
+        adopter = service.get_adopter_with_preferences(
+            email=user_context.email
+        )
+        return GenericObjectResponse(
+            message="Retrieved adopters successfully!",
+            data=adopter
+        )
+    except AdopterNotFound:
+        raise HTTPException(
+            status_code=403,
+            detail="Unregistered adopter."
+        )
+    except Exception as e:
+        print(e)
+        raise HTTPException(
+            status_code=500,
+            detail="Could not retrieve adopters."
+        )
+
+
+@router.post("/me/preferences", response_model=GenericObjectResponse[AdopterPreference])
+async def create_preferences(
+    body: CreateAdopterPreferenceRequestBody,
+    user_context: AdopterGoogleUser = Depends(authenticate_adopter)
+):
+    try:
+        service = AdopterPreferenceService()
+        preference = service.create_preference(
+            adopter_id=user_context.id,
+            **body.model_dump()
+        )
+
+        return GenericObjectResponse(
+            message="Created preferences successfully!",
+            data=preference
+        )
+    except AdopterNotFound:
+        raise HTTPException(
+            status_code=403,
+            detail="Unregistered adopter."
+        )
+    except Exception as e:
+        print(e)
+        raise HTTPException(
+            status_code=500,
+            detail="Could not create preferences."
         )

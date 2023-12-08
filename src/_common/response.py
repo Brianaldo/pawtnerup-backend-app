@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, Union
 from pydantic import BaseModel
 
 M = TypeVar("M", bound=BaseModel)

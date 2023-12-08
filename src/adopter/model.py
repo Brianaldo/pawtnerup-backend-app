@@ -1,6 +1,8 @@
-from typing import TypedDict
+from typing import TypedDict, Union
 
 from pydantic import BaseModel, constr
+
+from preference.model import AdopterPreference
 
 
 class AdopterTyped(TypedDict, total=False):
@@ -17,6 +19,7 @@ class Adopter(BaseModel):
     email: str
     bio: str
     profile_picture: str
+    preferences: Union[list[AdopterPreference], None]
 
 
 class CreateAdopterRequestBody(BaseModel):
