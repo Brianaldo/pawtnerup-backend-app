@@ -14,6 +14,8 @@ class AdopterEntity(Base):
     profile_picture = Column(String(200))
     questionnaire: Mapped["QuestionnaireEntity"] = relationship(
         back_populates="adopter", cascade='all, delete')
+    preferences: Mapped[list["AdopterPreferenceEntity"]] = relationship(
+        back_populates="adopter", cascade='all, delete')
 
     def to_model(self) -> Adopter:
         return Adopter(
@@ -21,7 +23,19 @@ class AdopterEntity(Base):
             name=self.name,
             email=self.email,
             bio=self.bio,
-            profile_picture=self.profile_picture
+            profile_picture=self.profile_picture,
+            preferences=None,
+        )
+
+    def to_model_with_preferences(self) -> Adopter:
+        return Adopter(
+            id=self.id,
+            name=self.name,
+            email=self.email,
+            bio=self.bio,
+            profile_picture=self.profile_picture,
+            preferences=list(
+                map(lambda pref: pref.to_model(), self.preferences)),
         )
 
     def __repr__(self):

@@ -3,8 +3,6 @@ from sqlalchemy.orm import relationship, Mapped
 from _infrastructure.database.base_model import Base
 from breed.model import Breed, BreedSizeEnum
 
-# from pet.entity import PetEntity
-
 
 class BreedEntity(Base):
     __tablename__ = "breeds"

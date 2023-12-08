@@ -11,10 +11,6 @@ class QuestionnaireRepository(BaseRepository[QuestionnaireTyped, QuestionnaireEn
 
     def create(self, adopter: Adopter, **kwargs: QuestionnaireTyped) -> QuestionnaireEntity:
         try:
-            adopter_entity = self.session.merge(AdopterEntity(
-                **adopter.model_dump(exclude_unset=True)
-            ))
-
             personality_entity = PetPersonalityQuestionnaireEntity(
                 answer=kwargs.get("pet_personality")
             )
@@ -40,7 +36,7 @@ class QuestionnaireRepository(BaseRepository[QuestionnaireTyped, QuestionnaireEn
             ]
 
             record = QuestionnaireEntity(
-                adopter=adopter_entity,
+                adopter_id=adopter.id,
                 pet_personality=personality_entity,
                 pet_sizes=pet_size_entities,
                 pet_ages=pet_age_entities,

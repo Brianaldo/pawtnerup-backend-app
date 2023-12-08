@@ -19,6 +19,8 @@ class PetEntity(Base):
     shelter: Mapped["ShelterEntity"] = relationship(back_populates="pets")
     breed_id = Column(Integer, ForeignKey("breeds.id"))
     breed: Mapped["BreedEntity"] = relationship(back_populates="pets")
+    preferences: Mapped[list["AdopterPreferenceEntity"]] = relationship(
+        back_populates="pet")
 
     def to_model(self) -> Pet:
         return Pet(
