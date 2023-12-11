@@ -1,7 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 
 from _common.response import GenericListResponse
-from breed.model import Breed, BreedTyped
+from breed.model import Breed, BreedSizeEnum, BreedTyped
 from breed.service import BreedService
 
 
@@ -12,10 +12,10 @@ router = APIRouter(
 
 
 @router.get("", response_model=GenericListResponse[Breed])
-async def get_breeds(id: int = None, name: str = None):
+async def get_breeds(id: int = None, name: str = None, size: list[BreedSizeEnum] = Query(None)):
     try:
         service = BreedService()
-        breeds = service.get_all(id=id, name=name)
+        breeds = service.get_all(id=id, name=name, size=size)
         return GenericListResponse(
             message="Retrieved breeds successfully!",
             data=breeds

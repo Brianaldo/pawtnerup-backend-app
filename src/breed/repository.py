@@ -16,6 +16,8 @@ class BreedRepository(BaseRepository[BreedTyped, BreedEntity]):
             BreedEntity.name.ilike(
                 "%{}%".format(name)
             ) if name is not None else True,
+            BreedEntity.size.in_(kwargs.get('size')) if kwargs.get(
+                'size') is not None else True,
         ).all()
 
     def get_one_by_filter(self, **kwargs: BreedTyped) -> BreedEntity:
