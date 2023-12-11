@@ -10,7 +10,6 @@ class AdopterEntity(Base):
     id = Column(String(30), primary_key=True)
     name = Column(String(50))
     email = Column(String(50), unique=True)
-    bio = Column(String(100))
     profile_picture = Column(String(200))
     questionnaire: Mapped["QuestionnaireEntity"] = relationship(
         back_populates="adopter", cascade='all, delete')
@@ -22,7 +21,6 @@ class AdopterEntity(Base):
             id=self.id,
             name=self.name,
             email=self.email,
-            bio=self.bio,
             profile_picture=self.profile_picture,
             preferences=None,
         )
@@ -32,7 +30,6 @@ class AdopterEntity(Base):
             id=self.id,
             name=self.name,
             email=self.email,
-            bio=self.bio,
             profile_picture=self.profile_picture,
             preferences=list(
                 map(lambda pref: pref.to_model(), self.preferences)),

@@ -1,7 +1,6 @@
 from _infrastructure.database.base_repository import BaseRepository
-from adopter.entity import AdopterEntity
 from adopter.model import Adopter
-from questionnaire.entities import BreedQuestionnaireEntity, PetAgeQuestionnaireEntity, PetGenderQuestionnaireEntity, PetPersonalityQuestionnaireEntity, PetSizeQuestionnaireEntity, QuestionnaireEntity
+from questionnaire.entities import BreedQuestionnaireEntity, PetAgeQuestionnaireEntity, PetGenderQuestionnaireEntity, PetSizeQuestionnaireEntity, QuestionnaireEntity
 from questionnaire.model import QuestionnaireTyped
 
 
@@ -11,10 +10,6 @@ class QuestionnaireRepository(BaseRepository[QuestionnaireTyped, QuestionnaireEn
 
     def create(self, adopter: Adopter, **kwargs: QuestionnaireTyped) -> QuestionnaireEntity:
         try:
-            personality_entity = PetPersonalityQuestionnaireEntity(
-                answer=kwargs.get("pet_personality")
-            )
-
             pet_size_entities = [
                 PetSizeQuestionnaireEntity(answer=size)
                 for size in kwargs.get("pet_sizes")

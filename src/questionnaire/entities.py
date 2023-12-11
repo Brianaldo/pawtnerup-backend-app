@@ -15,8 +15,6 @@ class QuestionnaireEntity(Base):
         "adopters.id", ondelete='CASCADE'), unique=True)
     adopter: Mapped["AdopterEntity"] = relationship(
         back_populates="questionnaire")
-    pet_personality: Mapped["PetPersonalityQuestionnaireEntity"] = relationship(
-        back_populates="questionnaire")
     pet_sizes: Mapped[list["PetSizeQuestionnaireEntity"]] = relationship(
         back_populates="questionnaire")
     pet_ages: Mapped[list["PetAgeQuestionnaireEntity"]] = relationship(
@@ -31,23 +29,12 @@ class QuestionnaireEntity(Base):
             id=self.id,
             adopter_id=self.adopter_id,
             adopter=self.adopter.to_model(),
-            pet_personality=self.pet_personality.answer,
             pet_sizes=list(map(lambda size: size.answer, self.pet_sizes)),
             pet_ages=list(map(lambda age: age.answer, self.pet_ages)),
             pet_genders=list(
                 map(lambda gender: gender.answer, self.pet_genders)),
             breeds=list(map(lambda breed: breed.breed.name, self.breeds))
         )
-
-
-class PetPersonalityQuestionnaireEntity(Base):
-    __tablename__ = "pet_personality_questionnaires"
-
-    id = Column(Integer, primary_key=True)
-    questionnaire_id = Column(Integer, ForeignKey("questionnaires.id"))
-    questionnaire: Mapped["QuestionnaireEntity"] = relationship(
-        back_populates="pet_personality")
-    answer = Column(String(100))
 
 
 class PetSizeQuestionnaireEntity(Base):

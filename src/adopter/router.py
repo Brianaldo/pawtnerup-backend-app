@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from _common.response import GenericObjectResponse
 from adopter.exceptions import AdopterAlreadyExists, AdopterNotFound
-from adopter.model import Adopter, CreateAdopterRequestBody
+from adopter.model import Adopter
 from adopter.service import AdopterService
 from auth.dependencies import authenticate_adopter
 from auth.models import AdopterGoogleUser
@@ -81,7 +81,6 @@ async def create_questionnaire(
             id=user_context.id,
             name=user_context.name or "",
             email=user_context.email,
-            bio=body.bio,
             profile_picture=user_context.picture or ""
         )
 
