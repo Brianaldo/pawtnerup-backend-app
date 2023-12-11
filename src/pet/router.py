@@ -4,7 +4,7 @@ from _common.response import GenericListResponse, GenericObjectResponse
 from auth.dependencies import authenticate_shelter
 
 from auth.models import ShelterGoogleUser
-from pet.model import CreatePetRequestBody, CreatePetResponseBody, DeletedResponse, Pet, PetMediaRequestBody, PetResponse, PetTrimmedResponse
+from pet.model import CreatePetRequestBody, CreatePetResponseBody, DeletedResponse, Pet, PetMediaRequestBody, PetResponse, PetTrimmedResponse, UpdatePetMediaRequestBody
 from pet.service import PetService
 
 
@@ -132,7 +132,7 @@ async def update_pet(
 @router.put("/{pet_id}/media", response_model=GenericObjectResponse[CreatePetResponseBody])
 async def update_pet_media(
     pet_id: str,
-    body: list[PetMediaRequestBody],
+    body: UpdatePetMediaRequestBody,
     user_context: ShelterGoogleUser = Depends(authenticate_shelter)
 ):
     try:
@@ -140,7 +140,7 @@ async def update_pet_media(
         (pet, urls) = service.update_media(
             shelter_email=user_context.email,
             pet_id=pet_id,
-            media=body
+            media=body.media
         )
 
         return GenericObjectResponse(
