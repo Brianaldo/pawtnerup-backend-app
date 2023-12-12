@@ -32,7 +32,6 @@ class QuestionnaireRepository(BaseRepository[QuestionnaireTyped, QuestionnaireEn
 
             record = QuestionnaireEntity(
                 adopter_id=adopter.id,
-                pet_personality=personality_entity,
                 pet_sizes=pet_size_entities,
                 pet_ages=pet_age_entities,
                 pet_genders=pet_gender_entities,
