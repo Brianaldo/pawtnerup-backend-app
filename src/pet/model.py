@@ -68,6 +68,16 @@ class AgeEnum(enum.Enum):
         else:
             raise ValueError("Invalid AgeEnum")
 
+    def from_float(age: float):
+        if age < 0.5:
+            return AgeEnum.PUPPY
+        elif age < 1:
+            return AgeEnum.YOUNG
+        elif age < 7:
+            return AgeEnum.ADULT
+        else:
+            return AgeEnum.SENIOR
+
 
 class PetTyped(TypedDict, total=False):
     id: int
