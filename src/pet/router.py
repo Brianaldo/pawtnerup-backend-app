@@ -4,7 +4,7 @@ from _common.response import GenericListResponse, GenericObjectResponse
 from auth.dependencies import authenticate_shelter
 
 from auth.models import ShelterGoogleUser
-from pet.model import CreatePetRequestBody, CreatePetResponseBody, DeletedResponse, Pet, PetMediaRequestBody, PetResponse, PetTrimmedResponse, UpdatePetMediaRequestBody
+from pet.model import CreatePetRequestBody, CreatePetResponseBody, DeletedResponse, Pet, PetMediaRequestBody, PetResponse, PetTrimmedResponse, UpdatePetMediaRequestBody, UpdatePetRequestBody
 from pet.service import PetService
 
 
@@ -101,7 +101,7 @@ async def get_pet(
 @router.put("/{pet_id}", response_model=GenericObjectResponse[PetResponse])
 async def update_pet(
     pet_id: str,
-    body: CreatePetRequestBody,
+    body: UpdatePetRequestBody,
     user_context: ShelterGoogleUser = Depends(authenticate_shelter)
 ):
     try:

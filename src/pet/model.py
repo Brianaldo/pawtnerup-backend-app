@@ -158,6 +158,15 @@ class CreatePetRequestBody(BaseModel):
     media: list[str] = []
 
 
+class UpdatePetRequestBody(BaseModel):
+    name: constr(strip_whitespace=True)
+    gender: GenderEnum
+    breed: constr(strip_whitespace=True)
+    estimate_age: float
+    sterilization_status: SterilizationEnum
+    rescue_story: Union[constr(strip_whitespace=True), None]
+
+
 class CreatePetResponseBody(BaseModel):
     pet: PetResponse
     post_media_urls: list[Union[str, None]]
