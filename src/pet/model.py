@@ -10,6 +10,22 @@ class GenderEnum(enum.Enum):
     MALE = "MALE"
     FEMALE = "FEMALE"
 
+    def to_str(self) -> str:
+        if self == GenderEnum.MALE:
+            return "Male"
+        elif self == GenderEnum.FEMALE:
+            return "Female"
+        else:
+            raise ValueError("Invalid GenderEnum")
+
+    def from_str(label: str):
+        if label in ('Male'):
+            return GenderEnum.MALE
+        elif label in ('Female'):
+            return GenderEnum.FEMALE
+        else:
+            raise ValueError("Invalid GenderEnum")
+
 
 class SterilizationEnum(enum.Enum):
     NEUTERED = "NEUTERED"
@@ -27,6 +43,40 @@ class AgeEnum(enum.Enum):
     ADULT = "ADULT"
     # > 7 years
     SENIOR = "SENIOR"
+
+    def to_str(self) -> str:
+        if self == AgeEnum.PUPPY:
+            return "Puppy (0 - 6 Months)"
+        elif self == AgeEnum.YOUNG:
+            return "Young (6 - 12 Months)"
+        elif self == AgeEnum.ADULT:
+            return "Adult (1 - 7 Years)"
+        elif self == AgeEnum.SENIOR:
+            return "Senior (>7 Years)"
+        else:
+            raise ValueError("Invalid AgeEnum")
+
+    def from_str(label: str):
+        if label in ('Puppy (0 - 6 Months)'):
+            return AgeEnum.PUPPY
+        elif label in ('Young (6 - 12 Months)'):
+            return AgeEnum.YOUNG
+        elif label in ('Adult (1 - 7 Years)'):
+            return AgeEnum.ADULT
+        elif label in ('Senior (>7 Years)'):
+            return AgeEnum.SENIOR
+        else:
+            raise ValueError("Invalid AgeEnum")
+
+    def from_float(age: float):
+        if age < 0.5:
+            return AgeEnum.PUPPY
+        elif age < 1:
+            return AgeEnum.YOUNG
+        elif age < 7:
+            return AgeEnum.ADULT
+        else:
+            return AgeEnum.SENIOR
 
 
 class PetTyped(TypedDict, total=False):

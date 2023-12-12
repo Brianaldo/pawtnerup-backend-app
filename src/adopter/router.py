@@ -1,11 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException
+from _common.exceptions import NotFoundException
 
-from _common.response import GenericObjectResponse
+from _common.response import GenericListResponse, GenericObjectResponse
 from adopter.exceptions import AdopterAlreadyExists, AdopterNotFound
 from adopter.model import Adopter
 from adopter.service import AdopterService
 from auth.dependencies import authenticate_adopter
 from auth.models import AdopterGoogleUser
+from ml_model.recommendation import RecommendationModel
+from pet.model import PetResponse
 from preference.model import AdopterPreference, CreateAdopterPreferenceRequestBody
 from preference.service import AdopterPreferenceService
 from questionnaire.model import CreateQuestionnaire, Questionnaire
@@ -161,4 +164,36 @@ async def create_preferences(
         raise HTTPException(
             status_code=500,
             detail="Could not create preferences."
+        )
+
+
+@router.get("/me/recommendations", response_model=GenericListResponse[PetResponse])
+async def get_recommendations(
+    user_context: AdopterGoogleUser = Depends(authenticate_adopter)
+):
+    try:
+        service = AdopterService()
+        adopter = service.get_adopter(
+            id=user_context.id
+        )
+
+        model = RecommendationModel()
+        recommendations = model.recommend(
+            adopter=adopter
+        )[:20]
+
+        return GenericListResponse(
+            message="Retrieved recommendations successfully!",
+            data=[pet.to_response() for pet in recommendations]
+        )
+    except NotFoundException as e:
+        raise HTTPException(
+            status_code=404,
+            detail=str(e)
+        )
+    except Exception as e:
+        print(e)
+        raise HTTPException(
+            status_code=500,
+            detail="Could not retrieve recommendations."
         )
