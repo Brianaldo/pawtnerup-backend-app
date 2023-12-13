@@ -1,6 +1,6 @@
 runtime: python39
 
-instance_class: B1
+instance_class: B2
 service: default
 entrypoint: cd src && gunicorn -w 1 -k uvicorn.workers.UvicornWorker main:app
 basic_scaling:

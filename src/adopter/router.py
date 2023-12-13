@@ -180,7 +180,7 @@ async def get_recommendations(
         model = RecommendationModel()
         recommendations = model.recommend(
             adopter=adopter
-        )[:20]
+        )[:10]
 
         return GenericListResponse(
             message="Retrieved recommendations successfully!",
