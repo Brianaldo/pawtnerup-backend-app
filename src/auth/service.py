@@ -117,7 +117,6 @@ class AuthService:
                 request=self.request,
                 audience=client_id
             )
-            print(payload)
 
             user_data = ShelterGoogleUser(
                 id=payload['sub'],
