@@ -29,6 +29,7 @@ class AuthService:
                         "https://www.googleapis.com/auth/userinfo.email",
                         "openid"
                     ],
+                    redirect_uri='postmessage'
                 )
             else:
                 client_id = GOOGLE_ADOPTER_CLIENT_ID
