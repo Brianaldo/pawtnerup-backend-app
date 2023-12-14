@@ -39,12 +39,8 @@ class PetService:
         pets = self.pet_repo.fetch_by_shelter(shelter_email=shelter_email)
         return [pet.to_model() for pet in pets]
 
-    def get_pet(self, shelter_email: str, pet_id: int) -> Pet:
-        shelter = self.shelter_repo.get_one_by_filter(
-            email=shelter_email
-        )
+    def get_pet(self, pet_id: int) -> Pet:
         pet = self.pet_repo.get_one_by_filter(
-            shelter_id=shelter.id,
             id=pet_id
         )
 

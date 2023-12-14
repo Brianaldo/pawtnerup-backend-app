@@ -29,6 +29,7 @@ class PetEntity(Base):
             name=self.name,
             gender=self.gender,
             shelter_id=self.shelter_id,
+            shelter=self.shelter.to_model(),
             breed=self.breed.name,
             born_date=self.born_date,
             sterilization_status=self.sterilization_status,

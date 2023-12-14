@@ -4,6 +4,7 @@ from typing import TypedDict, Union
 from pydantic import BaseModel, constr
 
 from _infrastructure.object_storage.configs import CLOUD_STORAGE_BUCKET
+from shelter.model import Shelter
 
 
 class GenderEnum(enum.Enum):
@@ -104,6 +105,7 @@ class PetTrimmedResponse(BaseModel):
 
 class PetResponse(BaseModel):
     id: int
+    shelter: Shelter
     name: str
     gender: GenderEnum
     breed: str
@@ -121,6 +123,7 @@ class Pet(BaseModel):
     breed: str
     born_date: date
     shelter_id: int
+    shelter: Shelter
     sterilization_status: SterilizationEnum
     rescue_story: Union[str, None]
     media: list[str]
@@ -130,6 +133,7 @@ class Pet(BaseModel):
         estimate_age = round((date.today() - self.born_date).days / 365.24, 1)
         return PetResponse(
             id=self.id,
+            shelter=self.shelter,
             name=self.name,
             gender=self.gender,
             breed=self.breed,

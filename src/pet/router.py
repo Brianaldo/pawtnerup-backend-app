@@ -71,13 +71,11 @@ async def get_pets(
 
 @router.get("/{pet_id}", response_model=GenericObjectResponse[PetResponse])
 async def get_pet(
-    pet_id: str,
-    user_context: ShelterGoogleUser = Depends(authenticate_shelter)
+    pet_id: str
 ):
     try:
         service = PetService()
         pet = service.get_pet(
-            shelter_email=user_context.email,
             pet_id=pet_id
         )
 
