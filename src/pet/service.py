@@ -15,8 +15,8 @@ class PetService:
         self.pet_repo = PetRepository()
         self.shelter_repo = ShelterRepository()
         self.storage_client = ObjectStorageClient()
-        # from ml_model.keyword_extraction import KeywordExtraction
-        # self.keyword_model = KeywordExtraction()
+        from ml_model.keyword_extraction import KeywordExtraction
+        self.keyword_model = KeywordExtraction()
 
     def create_pet(self, estimate_age: float, shelter_email: str, **kwargs: PetTyped) -> tuple[Pet, list[str]]:
         estimate_born_date = datetime.datetime.now(
@@ -31,8 +31,7 @@ class PetService:
             post_media_urls.append(url)
             kwargs.get('media')[i] = new_filename
 
-        # labels = self.keyword_model.extract(kwargs.get('rescue_story'))
-        labels = []
+        labels = self.keyword_model.extract(kwargs.get('rescue_story'))
 
         return (self.pet_repo.create(shelter_email=shelter_email, born_date=estimate_born_date, labels=labels, **kwargs).to_model(), post_media_urls)
 
@@ -56,8 +55,7 @@ class PetService:
             estimate_born_date = datetime.datetime.now(
             ) - datetime.timedelta(days=(estimate_age*365.24))
 
-            # labels = self.keyword_model.extract(kwargs.get('rescue_story'))
-            labels = []
+            labels = self.keyword_model.extract(kwargs.get('rescue_story'))
 
             pet = self.pet_repo.update(
                 pet_id=pet_id,

@@ -14,3 +14,20 @@
 #         keywords = [keyword for keyword, _ in keywords_with_scores]
 
 #         return keywords
+
+import requests
+
+
+class KeywordExtraction:
+    def __init__(self):
+        self.url = "http://10.184.0.3:5000"
+
+    def extract(self, text: str) -> list[str]:
+        files = {
+            'text': (None, text),
+        }
+
+        response = requests.post(
+            '{}/extract'.format(self.url), files=files
+        )
+        return response.json()['keywords']
