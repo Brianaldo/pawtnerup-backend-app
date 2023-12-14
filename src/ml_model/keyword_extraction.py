@@ -20,7 +20,7 @@ import requests
 
 class KeywordExtraction:
     def __init__(self):
-        self.url = "http://10.184.0.3:5000"
+        self.url = "http://34.101.37.249:5000"
 
     def extract(self, text: str) -> list[str]:
         files = {
