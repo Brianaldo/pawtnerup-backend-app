@@ -45,6 +45,7 @@ app = FastAPI()
 
 origins = [
     "http://localhost:3000",
+    "https://shelter-dot-igneous-walker-404307.et.r.appspot.com"
 ]
 
 app.add_middleware(
