@@ -6,3 +6,6 @@ entrypoint: cd src && gunicorn -w 1 -k uvicorn.workers.UvicornWorker main:app
 basic_scaling:
   max_instances: 1
   idle_timeout: 10m
+
+vpc_access_connector:
+  name: "projects/igneous-walker-404307/locations/asia-southeast2/connectors/pawtnerup-connector"
