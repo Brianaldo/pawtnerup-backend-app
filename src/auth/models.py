@@ -34,3 +34,7 @@ class RefreshTokenRequestBody(BaseModel):
 class LoginResponse(ShelterGoogleUser, BaseModel):
     access_token: str
     refresh_token: Union[str, None]
+
+
+class GenerateRefreshTokenRequestBody(BaseModel):
+    code: str

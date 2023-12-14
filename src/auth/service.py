@@ -6,37 +6,48 @@ from google.oauth2 import id_token
 import google.oauth2.credentials
 import google.auth.transport.requests
 
-from auth.configs import GOOGLE_ADOPTER_CLIENT_ID, GOOGLE_ADOPTER_CLIENT_SECRET, GOOGLE_SHELTER_CLIENT_ID, GOOGLE_SHELTER_CLIENT_SECRET, SHELTER_CLIENT_SECRET_FILE
+from auth.configs import ADOPTER_CLIENT_SECRET_FILE, GOOGLE_ADOPTER_CLIENT_ID, GOOGLE_ADOPTER_CLIENT_SECRET, GOOGLE_SHELTER_CLIENT_ID, GOOGLE_SHELTER_CLIENT_SECRET, SHELTER_CLIENT_SECRET_FILE
 from auth.exceptions import UnauthorizedError
 from auth.models import AdopterGoogleUser, GoogleUser, ShelterGoogleUser
 
 
 class AuthService:
-    def __init__(self) -> None:
-        self.flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
-            client_secrets_file=SHELTER_CLIENT_SECRET_FILE,
-            scopes=[
-                "https://www.googleapis.com/auth/userinfo.profile",
-                "https://www.googleapis.com/auth/userinfo.email",
-                "openid"
-            ],
-            redirect_uri='postmessage'
-        )
-        session = requests.session()
-        cached_session = CacheControl(session)
+    def __init__(self, isShelter: bool = True) -> None:
+        self.isShelter = isShelter
         self.request = google.auth.transport.requests.Request(
-            session=cached_session
+            session=CacheControl(requests.session())
         )
 
-    def generate_shelter_token(self, code: str) -> tuple[ShelterGoogleUser, str, str]:
+    def generate_token(self, code: str) -> tuple[Union[ShelterGoogleUser, AdopterGoogleUser], str, str]:
         try:
-            self.flow.fetch_token(code=code)
-            credentials = self.flow.credentials
+            if self.isShelter:
+                client_id = GOOGLE_SHELTER_CLIENT_ID
+                flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+                    client_secrets_file=SHELTER_CLIENT_SECRET_FILE,
+                    scopes=[
+                        "https://www.googleapis.com/auth/userinfo.profile",
+                        "https://www.googleapis.com/auth/userinfo.email",
+                        "openid"
+                    ],
+                )
+            else:
+                client_id = GOOGLE_ADOPTER_CLIENT_ID
+                flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+                    client_secrets_file=ADOPTER_CLIENT_SECRET_FILE,
+                    scopes=[
+                        "https://www.googleapis.com/auth/userinfo.profile",
+                        "https://www.googleapis.com/auth/userinfo.email",
+                        "openid"
+                    ],
+                )
+
+            flow.fetch_token(code=code)
+            credentials = flow.credentials
 
             payload = id_token.verify_oauth2_token(
                 id_token=credentials._id_token,
                 request=self.request,
-                audience=GOOGLE_SHELTER_CLIENT_ID
+                audience=client_id
             )
 
             user_data = ShelterGoogleUser(
@@ -83,9 +94,9 @@ class AuthService:
             print(e)
             raise UnauthorizedError(e)
 
-    def refresh_shelter_token(self, refresh_token: str, isShelter: bool = True) -> tuple[Union[ShelterGoogleUser, AdopterGoogleUser], str, str]:
+    def refresh_token(self, refresh_token: str) -> tuple[Union[ShelterGoogleUser, AdopterGoogleUser], str, str]:
         try:
-            if isShelter:
+            if self.isShelter:
                 client_id = GOOGLE_SHELTER_CLIENT_ID
                 client_secret = GOOGLE_SHELTER_CLIENT_SECRET
             else:
@@ -105,6 +116,7 @@ class AuthService:
                 request=self.request,
                 audience=client_id
             )
+            print(payload)
 
             user_data = ShelterGoogleUser(
                 id=payload['sub'],
@@ -113,7 +125,7 @@ class AuthService:
                 picture=payload['picture'] if 'picture' in payload else None,
                 given_name=payload['given_name'] if 'given_name' in payload else None,
                 family_name=payload['family_name'] if 'family_name' in payload else None,
-            ) if isShelter else AdopterGoogleUser(
+            ) if self.isShelter else AdopterGoogleUser(
                 id=payload['sub'],
                 email=payload['email'],
                 name=payload['name'] if 'name' in payload else None,

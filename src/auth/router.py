@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from _common import *
 
-from auth.models import LoginCallbackRequestBody, LoginResponse, RefreshTokenRequestBody, ShelterGoogleUser
+from auth.models import GenerateRefreshTokenRequestBody, LoginCallbackRequestBody, LoginResponse, RefreshTokenRequestBody, ShelterGoogleUser
 import auth.service
 
 router = APIRouter(
@@ -14,7 +14,7 @@ router = APIRouter(
 async def shelter_oauth2_callback(body: LoginCallbackRequestBody):
     try:
         service = auth.service.AuthService()
-        shelter_data, token, refresh_token = service.generate_shelter_token(
+        shelter_data, token, refresh_token = service.generate_token(
             code=body.code
         )
 
@@ -37,7 +37,7 @@ async def shelter_oauth2_callback(body: LoginCallbackRequestBody):
 async def shelter_refresh_token(body: RefreshTokenRequestBody):
     try:
         service = auth.service.AuthService()
-        shelter_data, token, refresh_token = service.refresh_shelter_token(
+        shelter_data, token, refresh_token = service.refresh_token(
             refresh_token=body.refresh_token
         )
 
@@ -53,4 +53,27 @@ async def shelter_refresh_token(body: RefreshTokenRequestBody):
         raise HTTPException(
             status_code=500,
             detail="Could not refresh."
+        )
+
+
+@router.post("/adopter/generate-refresh-token", response_model=GenericObjectResponse[LoginResponse])
+async def adopter_generate_refresh_token(body: GenerateRefreshTokenRequestBody):
+    try:
+        service = auth.service.AuthService(isShelter=False)
+        adopter_data, token, refresh_token = service.generate_token(
+            code=body.code
+        )
+
+        return GenericObjectResponse(
+            message="Logged in successfully!",
+            data=LoginResponse(**adopter_data.model_dump(),
+                               access_token=token,
+                               refresh_token=refresh_token
+                               )
+        )
+    except Exception as e:
+        print(e)
+        raise HTTPException(
+            status_code=500,
+            detail="Could not log in."
         )

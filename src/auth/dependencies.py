@@ -41,7 +41,7 @@ def authenticate_adopter(
         token: HTTPAuthorizationCredentials = Depends(security_scheme),
 ) -> AdopterGoogleUser:
     try:
-        service = AuthService()
+        service = AuthService(isShelter=False)
         info = service.get_user_from_token(
             token=token.credentials
         )
@@ -51,6 +51,7 @@ def authenticate_adopter(
                 status_code=403,
                 detail="Forbidden."
             )
+
         return info
     except Exception:
         if x_refresh_token is None:
@@ -59,10 +60,10 @@ def authenticate_adopter(
                 detail="Unauthorized."
             )
         try:
-            info = service.refresh_shelter_token(
+            (info, _, _) = service.refresh_token(
                 refresh_token=x_refresh_token,
-                isShelter=False
             )
+
             return info
         except Exception as e:
             print(e)
