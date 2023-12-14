@@ -11,6 +11,7 @@ ADOPTER_CLIENT_SECRET_FILE = os.path.join(
 with open(ADOPTER_CLIENT_SECRET_FILE) as f:
     data = json.load(f)
     GOOGLE_ADOPTER_CLIENT_ID = data["web"]["client_id"]
+    GOOGLE_ADOPTER_CLIENT_SECRET = data["web"]["client_secret"]
 
 
 """

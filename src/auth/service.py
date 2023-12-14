@@ -83,14 +83,18 @@ class AuthService:
             print(e)
             raise UnauthorizedError(e)
 
-    def refresh_shelter_token(self, refresh_token: str) -> tuple[ShelterGoogleUser, str, str]:
+    def refresh_shelter_token(self, refresh_token: str, isShelter: bool = True) -> tuple[Union[ShelterGoogleUser, AdopterGoogleUser], str, str]:
         try:
+            if isShelter:
+                client_id = GOOGLE_SHELTER_CLIENT_ID
+                client_secret = GOOGLE_SHELTER_CLIENT_SECRET
+
             credentials = google.oauth2.credentials.Credentials(
                 None,
                 refresh_token=refresh_token,
                 token_uri='https://oauth2.googleapis.com/token',
-                client_id=GOOGLE_SHELTER_CLIENT_ID,
-                client_secret=GOOGLE_SHELTER_CLIENT_SECRET
+                client_id=client_id,
+                client_secret=client_secret
             )
 
             credentials.refresh(self.request)
@@ -98,10 +102,17 @@ class AuthService:
             payload = id_token.verify_oauth2_token(
                 id_token=credentials.id_token,
                 request=self.request,
-                audience=GOOGLE_SHELTER_CLIENT_ID
+                audience=client_id
             )
 
             user_data = ShelterGoogleUser(
+                id=payload['sub'],
+                email=payload['email'],
+                name=payload['name'] if 'name' in payload else None,
+                picture=payload['picture'] if 'picture' in payload else None,
+                given_name=payload['given_name'] if 'given_name' in payload else None,
+                family_name=payload['family_name'] if 'family_name' in payload else None,
+            ) if isShelter else AdopterGoogleUser(
                 id=payload['sub'],
                 email=payload['email'],
                 name=payload['name'] if 'name' in payload else None,
