@@ -6,7 +6,7 @@ from google.oauth2 import id_token
 import google.oauth2.credentials
 import google.auth.transport.requests
 
-from auth.configs import GOOGLE_ADOPTER_CLIENT_ID, GOOGLE_SHELTER_CLIENT_ID, GOOGLE_SHELTER_CLIENT_SECRET, SHELTER_CLIENT_SECRET_FILE
+from auth.configs import GOOGLE_ADOPTER_CLIENT_ID, GOOGLE_ADOPTER_CLIENT_SECRET, GOOGLE_SHELTER_CLIENT_ID, GOOGLE_SHELTER_CLIENT_SECRET, SHELTER_CLIENT_SECRET_FILE
 from auth.exceptions import UnauthorizedError
 from auth.models import AdopterGoogleUser, GoogleUser, ShelterGoogleUser
 
@@ -88,6 +88,9 @@ class AuthService:
             if isShelter:
                 client_id = GOOGLE_SHELTER_CLIENT_ID
                 client_secret = GOOGLE_SHELTER_CLIENT_SECRET
+            else:
+                client_id = GOOGLE_ADOPTER_CLIENT_ID
+                client_secret = GOOGLE_ADOPTER_CLIENT_SECRET
 
             credentials = google.oauth2.credentials.Credentials(
                 None,
@@ -96,9 +99,7 @@ class AuthService:
                 client_id=client_id,
                 client_secret=client_secret
             )
-
             credentials.refresh(self.request)
-
             payload = id_token.verify_oauth2_token(
                 id_token=credentials.id_token,
                 request=self.request,

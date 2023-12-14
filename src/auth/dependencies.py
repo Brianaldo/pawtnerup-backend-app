@@ -43,14 +43,16 @@ def authenticate_adopter(
     try:
         service = AuthService()
         info = service.get_user_from_token(
-            token=token.credentials)
+            token=token.credentials
+        )
 
         if info.role != 'ADOPTER':
             raise HTTPException(
                 status_code=403,
                 detail="Forbidden."
             )
-    except UnauthorizedError:
+        return info
+    except Exception:
         if x_refresh_token is None:
             raise HTTPException(
                 status_code=401,
@@ -58,7 +60,7 @@ def authenticate_adopter(
             )
         try:
             info = service.refresh_shelter_token(
-                x_refresh_token=x_refresh_token,
+                refresh_token=x_refresh_token,
                 isShelter=False
             )
             return info
