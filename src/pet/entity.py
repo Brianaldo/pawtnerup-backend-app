@@ -14,6 +14,7 @@ class PetEntity(Base):
     sterilization_status = Column(Enum(SterilizationEnum))
     rescue_story = Column(Text, nullable=True)
     media = Column(ARRAY(String), default=[])
+    labels = Column(ARRAY(String), default=[])
 
     shelter_id = Column(Integer, ForeignKey("shelters.id"))
     shelter: Mapped["ShelterEntity"] = relationship(back_populates="pets")
@@ -33,4 +34,5 @@ class PetEntity(Base):
             sterilization_status=self.sterilization_status,
             rescue_story=self.rescue_story,
             media=self.media,
+            labels=self.labels
         )

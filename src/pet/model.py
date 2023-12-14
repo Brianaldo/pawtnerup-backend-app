@@ -89,6 +89,7 @@ class PetTyped(TypedDict, total=False):
     sterilization_status: SterilizationEnum
     rescue_story: Union[str, None]
     media: list[str]
+    labels: list[str]
 
 
 class PetTrimmedResponse(BaseModel):
@@ -98,6 +99,7 @@ class PetTrimmedResponse(BaseModel):
     breed: str
     estimate_age: float
     sterilization_status: SterilizationEnum
+    labels: list[str]
 
 
 class PetResponse(BaseModel):
@@ -109,6 +111,7 @@ class PetResponse(BaseModel):
     sterilization_status: SterilizationEnum
     rescue_story: Union[str, None]
     media: list[str]
+    labels: list[str]
 
 
 class Pet(BaseModel):
@@ -121,6 +124,7 @@ class Pet(BaseModel):
     sterilization_status: SterilizationEnum
     rescue_story: Union[str, None]
     media: list[str]
+    labels: list[str]
 
     def to_response(self) -> PetResponse:
         estimate_age = round((date.today() - self.born_date).days / 365.24, 1)
@@ -133,7 +137,11 @@ class Pet(BaseModel):
             sterilization_status=self.sterilization_status,
             rescue_story=self.rescue_story,
             media=map(
-                lambda url: "https://storage.googleapis.com/{}/{}".format(CLOUD_STORAGE_BUCKET, url), self.media),
+                lambda url: "https://storage.googleapis.com/{}/{}".format(
+                    CLOUD_STORAGE_BUCKET, url
+                ), self.media
+            ),
+            labels=self.labels,
         )
 
     def to_trimmed_response(self) -> PetTrimmedResponse:
@@ -145,6 +153,7 @@ class Pet(BaseModel):
             breed=self.breed,
             estimate_age=estimate_age,
             sterilization_status=self.sterilization_status,
+            labels=self.labels,
         )
 
 
