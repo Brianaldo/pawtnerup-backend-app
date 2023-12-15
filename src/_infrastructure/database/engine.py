@@ -13,4 +13,8 @@ connection_string = 'postgresql+psycopg2://{user}:{password}@{hostname}/{databas
 db_engine = create_engine(
     connection_string,
     echo=False,
+    pool_size=3,
+    max_overflow=7,
+    pool_timeout=60,
+    pool_recycle=900,
 )
